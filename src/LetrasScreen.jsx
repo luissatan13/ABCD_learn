@@ -19,8 +19,15 @@ const VOCAL_DATA = [
   { letter: 'U', emoji: '🦄', word: 'UNICORNIO', color: 'vocal-u', example: 'U de Unicornio' },
 ];
 
-const CONSONANTES = ['M', 'P', 'S', 'L', 'N', 'F', 'D', 'T', 'V', 'B', 'R', 'C', 'G', 'J'];
+const CONSONANTES = ['B', 'C', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'Ñ', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z'];
 const VOCALES = ['A', 'E', 'I', 'O', 'U'];
+
+const getSilabasForConsonante = (consonant) => {
+  if (consonant === 'Q') {
+    return ['QUE', 'QUI'];
+  }
+  return VOCALES.map(v => consonant + v);
+};
 
 export function LetrasScreen() {
   const [selectedVocal, setSelectedVocal] = useState(null);
@@ -126,20 +133,17 @@ export function LetrasScreen() {
 
             {/* Syllables for active consonant */}
             <div className="silabas-grid">
-              {VOCALES.map(v => {
-                const silaba = activeConsonant + v;
-                return (
-                  <button
-                    key={silaba}
-                    id={`silaba-${silaba}`}
-                    className="silaba-btn"
-                    onClick={() => handleSilabaClick(silaba)}
-                    aria-label={`Sílaba ${silaba}`}
-                  >
-                    {silaba}
-                  </button>
-                );
-              })}
+              {getSilabasForConsonante(activeConsonant).map(silaba => (
+                <button
+                  key={silaba}
+                  id={`silaba-${silaba}`}
+                  className="silaba-btn"
+                  onClick={() => handleSilabaClick(silaba)}
+                  aria-label={`Sílaba ${silaba}`}
+                >
+                  {silaba}
+                </button>
+              ))}
             </div>
           </div>
 

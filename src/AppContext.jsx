@@ -19,9 +19,26 @@ const INITIAL_LEVELS = [
   { id: 6, label: 'Repaso Vocales', type: 'repaso', target: 'A_E_I_O_U', status: 'locked', stars: 0 },
   { id: 7, label: 'Sílabas M', type: 'silabas', target: 'M', status: 'locked', stars: 0 },
   { id: 8, label: 'Sílabas P', type: 'silabas', target: 'P', status: 'locked', stars: 0 },
-  { id: 9, label: 'Repaso M y P', type: 'repaso', target: 'M_P', status: 'locked', stars: 0 },
-  { id: 10, label: 'Sílabas S y L', type: 'silabas', target: 'S_L', status: 'locked', stars: 0 },
-  { id: 11, label: 'Repaso Difíciles', type: 'repaso', target: 'DIFFICULT', status: 'locked', stars: 0 },
+  { id: 9, label: 'Sílabas S y L', type: 'silabas', target: 'S_L', status: 'locked', stars: 0 },
+  { id: 10, label: 'Sílabas B', type: 'silabas', target: 'B', status: 'locked', stars: 0 },
+  { id: 11, label: 'Sílabas C', type: 'silabas', target: 'C', status: 'locked', stars: 0 },
+  { id: 12, label: 'Sílabas D', type: 'silabas', target: 'D', status: 'locked', stars: 0 },
+  { id: 13, label: 'Sílabas F', type: 'silabas', target: 'F', status: 'locked', stars: 0 },
+  { id: 14, label: 'Sílabas G', type: 'silabas', target: 'G', status: 'locked', stars: 0 },
+  { id: 15, label: 'Sílabas H', type: 'silabas', target: 'H', status: 'locked', stars: 0 },
+  { id: 16, label: 'Sílabas J', type: 'silabas', target: 'J', status: 'locked', stars: 0 },
+  { id: 17, label: 'Sílabas K', type: 'silabas', target: 'K', status: 'locked', stars: 0 },
+  { id: 18, label: 'Sílabas N', type: 'silabas', target: 'N', status: 'locked', stars: 0 },
+  { id: 19, label: 'Sílabas Ñ', type: 'silabas', target: 'Ñ', status: 'locked', stars: 0 },
+  { id: 20, label: 'Sílabas Q', type: 'silabas', target: 'Q', status: 'locked', stars: 0 },
+  { id: 21, label: 'Sílabas R', type: 'silabas', target: 'R', status: 'locked', stars: 0 },
+  { id: 22, label: 'Sílabas T', type: 'silabas', target: 'T', status: 'locked', stars: 0 },
+  { id: 23, label: 'Sílabas V', type: 'silabas', target: 'V', status: 'locked', stars: 0 },
+  { id: 24, label: 'Sílabas W', type: 'silabas', target: 'W', status: 'locked', stars: 0 },
+  { id: 25, label: 'Sílabas X', type: 'silabas', target: 'X', status: 'locked', stars: 0 },
+  { id: 26, label: 'Sílabas Y', type: 'silabas', target: 'Y', status: 'locked', stars: 0 },
+  { id: 27, label: 'Sílabas Z', type: 'silabas', target: 'Z', status: 'locked', stars: 0 },
+  { id: 28, label: 'Repaso Difíciles', type: 'repaso', target: 'DIFFICULT', status: 'locked', stars: 0 },
 ];
 
 const INITIAL_MEDALS = [
@@ -45,8 +62,26 @@ export function AppProvider({ children }) {
   });
 
   const [levels, setLevels] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('adl_levels')) || INITIAL_LEVELS; }
-    catch { return INITIAL_LEVELS; }
+    try {
+      const saved = JSON.parse(localStorage.getItem('adl_levels'));
+      if (saved && Array.isArray(saved) && saved.length === INITIAL_LEVELS.length) {
+        return saved;
+      }
+      // If old version stored fewer levels, merge completed status
+      if (saved && Array.isArray(saved) && saved.length > 0) {
+        const savedMap = new Map(saved.map(l => [l.id, l]));
+        return INITIAL_LEVELS.map(initL => {
+          const s = savedMap.get(initL.id);
+          if (s) {
+            return { ...initL, status: s.status, stars: s.stars };
+          }
+          return initL;
+        });
+      }
+      return INITIAL_LEVELS;
+    } catch {
+      return INITIAL_LEVELS;
+    }
   });
 
   const [medals, setMedals] = useState(() => {

@@ -56,22 +56,42 @@ export function LoginScreen({ onLoginSuccess }) {
         <p className="login-subtitle">¿Listo para tu aventura mágica de lectura?</p>
       </div>
 
-      <button
-        id="google-login-btn"
-        className="google-btn"
-        onClick={handleGoogleLogin}
-        disabled={loading}
-        aria-label="Continuar con Google"
-      >
-        {loading ? (
-          <span style={{ fontSize: 16 }}>⏳ Entrando...</span>
-        ) : (
-          <>
-            <GoogleLogo />
-            <span>Continuar con Google</span>
-          </>
-        )}
-      </button>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: '100%', maxWidth: 300 }}>
+        <button
+          id="google-login-btn"
+          className="google-btn"
+          onClick={handleGoogleLogin}
+          disabled={loading}
+          aria-label="Continuar con Google"
+        >
+          {loading ? (
+            <span style={{ fontSize: 16 }}>⏳ Entrando...</span>
+          ) : (
+            <>
+              <GoogleLogo />
+              <span>Continuar con Google</span>
+            </>
+          )}
+        </button>
+
+        <button
+          id="guest-login-btn"
+          className="btn-primary"
+          onClick={() => {
+            login({
+              name: 'Invitado',
+              email: 'invitado@abcd.learn',
+              picture: '/owl_mascot.png',
+              sub: 'guest-123',
+            });
+            onLoginSuccess();
+          }}
+          style={{ background: 'var(--gold-btn)', color: 'var(--text-dark)' }}
+          aria-label="Entrar como Invitado"
+        >
+          🎮 Entrar como Invitado
+        </button>
+      </div>
     </div>
   );
 }

@@ -58,6 +58,77 @@ const ALL_GAME_DATA = [
   { word: 'SOL', blank: 0, answer: 'SO', options: ['LO', 'SO', 'PO'], emoji: '☀️', hint: 'Da calor', target: 'S_L' },
   { word: 'LIMA', blank: 0, answer: 'LI', options: ['PI', 'LI', 'MI'], emoji: '🍋', hint: 'Fruta cítrica', target: 'S_L' },
   { word: 'SOPA', blank: 0, answer: 'SO', options: ['PO', 'SO', 'MO'], emoji: '🍲', hint: 'Comida caliente', target: 'S_L' },
+
+  // B
+  { word: 'BARCO', blank: 0, answer: 'BA', options: ['BA', 'CA', 'DA'], emoji: '⛵', hint: 'Navega en el agua', target: 'B' },
+  { word: 'BEBÉ', blank: 0, answer: 'BE', options: ['ME', 'BE', 'PE'], emoji: '👶', hint: 'Un niño pequeñito', target: 'B' },
+  { word: 'BICI', blank: 0, answer: 'BI', options: ['BI', 'PI', 'DI'], emoji: '🚲', hint: 'Tiene dos ruedas', target: 'B' },
+  { word: 'BOTA', blank: 0, answer: 'BO', options: ['MO', 'BO', 'SO'], emoji: '🥾', hint: 'Calzado alto', target: 'B' },
+  { word: 'BURRO', blank: 0, answer: 'BU', options: ['BU', 'MU', 'PU'], emoji: '🫏', hint: 'Animal orejón', target: 'B' },
+
+  // C
+  { word: 'CASA', blank: 0, answer: 'CA', options: ['CA', 'MA', 'PA'], emoji: '🏠', hint: 'Donde vives', target: 'C' },
+  { word: 'CONEJO', blank: 0, answer: 'CO', options: ['CO', 'MO', 'SO'], emoji: '🐰', hint: 'Come zanahorias', target: 'C' },
+  { word: 'CUNA', blank: 0, answer: 'CU', options: ['PU', 'CU', 'MU'], emoji: '🛏️', hint: 'Cama de bebé', target: 'C' },
+
+  // D
+  { word: 'DADO', blank: 0, answer: 'DA', options: ['DA', 'LA', 'MA'], emoji: '🎲', hint: 'Tiene puntos y rueda', target: 'D' },
+  { word: 'DEDO', blank: 0, answer: 'DE', options: ['ME', 'DE', 'PE'], emoji: '👆', hint: 'Tienes cinco en la mano', target: 'D' },
+  { word: 'DIENTE', blank: 0, answer: 'DI', options: ['DI', 'PI', 'MI'], emoji: '🦷', hint: 'Para masticar', target: 'D' },
+
+  // F
+  { word: 'FUEGO', blank: 0, answer: 'FU', options: ['FU', 'MU', 'PU'], emoji: '🔥', hint: 'Da calor y luz', target: 'F' },
+  { word: 'FOTO', blank: 0, answer: 'FO', options: ['MO', 'FO', 'SO'], emoji: '📷', hint: 'Captura un recuerdo', target: 'F' },
+
+  // G
+  { word: 'GATO', blank: 0, answer: 'GA', options: ['GA', 'MA', 'PA'], emoji: '🐱', hint: 'Hace miau', target: 'G' },
+  { word: 'GOTA', blank: 0, answer: 'GO', options: ['GO', 'MO', 'BO'], emoji: '💧', hint: 'Una gota de agua', target: 'G' },
+
+  // H
+  { word: 'HELADO', blank: 0, answer: 'HE', options: ['HE', 'ME', 'PE'], emoji: '🍦', hint: 'Postre frío y rico', target: 'H' },
+  { word: 'HUEVO', blank: 0, answer: 'HU', options: ['HU', 'MU', 'PU'], emoji: '🥚', hint: 'Lo pone la gallina', target: 'H' },
+
+  // J
+  { word: 'JABÓN', blank: 0, answer: 'JA', options: ['JA', 'MA', 'PA'], emoji: '🧼', hint: 'Para lavarse las manos', target: 'J' },
+  { word: 'JUGO', blank: 0, answer: 'JU', options: ['JU', 'MU', 'LU'], emoji: '🧃', hint: 'Bebida de frutas', target: 'J' },
+
+  // K
+  { word: 'KOALA', blank: 0, answer: 'KO', options: ['KO', 'MO', 'SO'], emoji: '🐨', hint: 'Animal tierno de eucalipto', target: 'K' },
+  { word: 'KIWI', blank: 0, answer: 'KI', options: ['KI', 'MI', 'PI'], emoji: '🥝', hint: 'Fruta verde por dentro', target: 'K' },
+
+  // N
+  { word: 'NUBE', blank: 0, answer: 'NU', options: ['NU', 'MU', 'PU'], emoji: '☁️', hint: 'En el cielo blanca', target: 'N' },
+  { word: 'NIDO', blank: 0, answer: 'NI', options: ['NI', 'PI', 'MI'], emoji: '🪹', hint: 'Casa de los pájaros', target: 'N' },
+
+  // Ñ
+  { word: 'ÑANDÚ', blank: 0, answer: 'ÑA', options: ['ÑA', 'MA', 'PA'], emoji: '🐦', hint: 'Ave corredora', target: 'Ñ' },
+
+  // Q
+  { word: 'QUESO', blank: 0, answer: 'QUE', options: ['QUE', 'PA', 'MA'], emoji: '🧀', hint: 'Le gusta al ratón', target: 'Q' },
+
+  // R
+  { word: 'RANA', blank: 0, answer: 'RA', options: ['RA', 'MA', 'SA'], emoji: '🐸', hint: 'Verde y saltarina', target: 'R' },
+  { word: 'ROSA', blank: 0, answer: 'RO', options: ['RO', 'SO', 'MO'], emoji: '🌹', hint: 'Una flor bonita', target: 'R' },
+
+  // T
+  { word: 'TAZA', blank: 0, answer: 'TA', options: ['TA', 'MA', 'PA'], emoji: '☕', hint: 'Para tomar café o té', target: 'T' },
+  { word: 'TOMATE', blank: 0, answer: 'TO', options: ['TO', 'MO', 'PO'], emoji: '🍅', hint: 'Verdura roja', target: 'T' },
+
+  // V
+  { word: 'VACA', blank: 0, answer: 'VA', options: ['VA', 'MA', 'PA'], emoji: '🐮', hint: 'Da leche rica', target: 'V' },
+  { word: 'VELA', blank: 0, answer: 'VE', options: ['VE', 'ME', 'PE'], emoji: '🕯️', hint: 'Da luz con fuego', target: 'V' },
+
+  // W
+  { word: 'WAFLE', blank: 0, answer: 'WA', options: ['WA', 'MA', 'PA'], emoji: '🧇', hint: 'Rico para el desayuno', target: 'W' },
+
+  // X
+  { word: 'XILÓFONO', blank: 0, answer: 'XI', options: ['XI', 'PI', 'MI'], emoji: '🎼', hint: 'Instrumento musical', target: 'X' },
+
+  // Y
+  { word: 'YATE', blank: 0, answer: 'YA', options: ['YA', 'MA', 'PA'], emoji: '🛥️', hint: 'Barco elegante', target: 'Y' },
+
+  // Z
+  { word: 'ZAPATO', blank: 0, answer: 'ZA', options: ['ZA', 'MA', 'PA'], emoji: '👞', hint: 'En el pie', target: 'Z' },
 ];
 
 function StarRain() {
@@ -160,7 +231,8 @@ export function GameScreen({ level, onComplete }) {
     
     // Shuffle and pick 5
     return filtered.sort(() => 0.5 - Math.random()).slice(0, 5);
-  }, [level, mistakes]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [level.id]);
 
   const TOTAL_QUESTIONS = Math.min(5, questions.length);
   const current = questions[questionIndex];
@@ -193,14 +265,15 @@ export function GameScreen({ level, onComplete }) {
         }
       }, 700);
     } else {
+      // Clearly mark error to user: red button + shake + feedback text + speech
       setFeedback('wrong');
       setErrors(e => e + 1);
-      recordMistake(current.answer); // Track the mistake!
+      recordMistake(current.answer);
       speak('Intenta de nuevo');
       setTimeout(() => {
         setSelected(null);
         setFeedback(null);
-      }, 900);
+      }, 1000);
     }
   }, [feedback, current, questionIndex, errors, level, completeLevel, recordMistake, TOTAL_QUESTIONS]);
 
