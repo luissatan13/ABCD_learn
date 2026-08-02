@@ -1011,6 +1011,63 @@ body {
   font-weight: 600;
 }
 
+.settings-item-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.voice-selector-grid {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.voice-select-btn {
+  flex: 1;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--border);
+  background: var(--bg);
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-dark);
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.voice-select-btn.active {
+  background: var(--primary-blue-light);
+  border-color: var(--primary-blue);
+  color: var(--primary-blue-dark);
+  box-shadow: 0 2px 8px rgba(26, 111, 224, 0.2);
+}
+
+.voice-test-btn {
+  width: 100%;
+  padding: 10px;
+  border-radius: var(--radius-full);
+  border: 1.5px solid var(--border);
+  background: var(--bg-card);
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--primary-blue-dark);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.voice-test-btn:active {
+  background: var(--primary-blue-light);
+}
+
 .logout-btn {
   margin-top: 24px;
   background: #FEF2F2;
@@ -1140,3 +1197,796 @@ body {
 @media (min-width: 391px) {
   body { background: #A89878; }
 }
+
+/* ================================================
+   SPEECH RECOGNITION MIC BUTTON & VOICE STYLES
+   ================================================ */
+
+.speech-mic-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 0;
+  width: 100%;
+}
+
+.speech-mic-btn {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 3px solid var(--primary-blue);
+  background: var(--bg-card);
+  box-shadow: 0 4px 16px rgba(26, 111, 224, 0.25);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.speech-mic-btn:hover {
+  transform: scale(1.06);
+}
+
+.speech-mic-btn:active {
+  transform: scale(0.95);
+}
+
+.speech-mic-btn.listening {
+  background: #FEF2F2;
+  border-color: #EF4444;
+  box-shadow: 0 0 0 8px rgba(239, 68, 68, 0.2);
+  animation: micPulse 1.2s infinite ease-in-out;
+}
+
+@keyframes micPulse {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+  70% { box-shadow: 0 0 0 16px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.speech-mic-icon {
+  font-size: 32px;
+  z-index: 2;
+}
+
+.speech-mic-waves {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.speech-mic-status {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.speech-status-listening {
+  color: #DC2626;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.speech-pulse-dot {
+  font-size: 12px;
+  animation: blink 0.8s infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0.3; }
+}
+
+.speech-status-text {
+  color: var(--primary-blue-dark);
+  background: var(--primary-blue-light);
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+}
+
+.speech-status-prompt {
+  color: var(--text-medium);
+}
+
+.speech-status-error {
+  color: #EF4444;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.speech-status-warning {
+  color: #B45309;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.game-mic-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #FFFBEB;
+  border: 1.5px solid #FCD34D;
+  border-radius: var(--radius-md);
+  padding: 12px;
+  margin-top: 8px;
+  width: 100%;
+}
+
+.game-mic-hint {
+  font-size: 13px;
+  font-weight: 800;
+  color: #92400E;
+}
+
+/* ================================================
+   LECTURA POR SÍLABAS COMPONENT STYLES
+   ================================================ */
+
+.letras-top-nav-wrapper {
+  display: flex;
+  align-items: center;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  width: 100%;
+  padding: 4px 6px;
+}
+
+.nav-scroll-arrow {
+  width: 28px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-light);
+  border: 1px solid var(--border);
+  color: var(--primary-blue-dark);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  z-index: 5;
+  transition: background 0.15s;
+}
+
+.nav-scroll-arrow:active {
+  background: var(--border);
+}
+
+.letras-top-nav {
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-blue) var(--bg-light);
+  flex: 1;
+}
+
+.letras-top-nav::-webkit-scrollbar {
+  height: 4px;
+}
+
+.letras-top-nav::-webkit-scrollbar-thumb {
+  background: var(--primary-blue);
+  border-radius: 4px;
+}
+
+.letras-nav-btn {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  padding: 8px 14px;
+  border-radius: var(--radius-full);
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-dark);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.letras-nav-btn.active {
+  background: var(--primary-blue);
+  color: white;
+  border-color: var(--primary-blue);
+  box-shadow: 0 2px 8px rgba(26, 111, 224, 0.3);
+}
+
+.letras-content {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.lectura-silabica-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.silabica-tabs {
+  display: flex;
+  gap: 6px;
+  background: var(--bg-light);
+  padding: 6px;
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+}
+
+.silabica-tab-btn {
+  flex: 1;
+  white-space: nowrap;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: transparent;
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-medium);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.silabica-tab-btn.active {
+  background: var(--bg-card);
+  color: var(--primary-blue);
+  box-shadow: var(--shadow-sm);
+}
+
+.silabica-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.silabica-title {
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--text-dark);
+}
+
+.silabica-subtitle {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--primary-blue-dark);
+  margin-top: 8px;
+}
+
+.silabica-desc {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-light);
+}
+
+.silabica-divider {
+  border: none;
+  border-top: 1.5px dashed var(--border);
+  margin: 8px 0;
+}
+
+/* Consonant Scroll */
+.consonant-scroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  scrollbar-width: none;
+}
+.consonant-scroll::-webkit-scrollbar { display: none; }
+
+.consonant-pill {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--bg-card);
+  font-family: 'Nunito', sans-serif;
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--text-dark);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+
+.consonant-pill.active {
+  background: var(--primary-blue);
+  color: white;
+  border-color: var(--primary-blue);
+  transform: scale(1.1);
+}
+
+/* Syllable Combination Grid */
+.syllable-combo-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.syllable-combo-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-blue-light);
+  border: 2px solid #BFDBFE;
+  border-radius: var(--radius-md);
+  padding: 10px 4px;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.syllable-combo-card:active {
+  transform: scale(0.95);
+}
+
+.combo-formula {
+  font-size: 11px;
+  font-weight: 700;
+  color: #2563EB;
+}
+
+.combo-result {
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--primary-blue-dark);
+}
+
+.combo-speaker {
+  font-size: 12px;
+}
+
+/* Word Decomposition Card */
+.word-decom-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  background: var(--bg-light);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  border: 2px solid var(--border);
+}
+
+.word-decom-emoji {
+  font-size: 56px;
+}
+
+.syllable-chips-row {
+  display: flex;
+  gap: 12px;
+}
+
+.syllable-chip {
+  padding: 12px 24px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--primary-blue-dark);
+  background: white;
+  border: 3px solid var(--primary-blue);
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+  cursor: pointer;
+  transition: transform 0.15s, background 0.15s;
+}
+
+.syllable-chip:active {
+  transform: scale(0.94);
+  background: var(--primary-blue-light);
+}
+
+.btn-read-whole {
+  font-size: 15px;
+  padding: 12px 20px;
+}
+
+.word-nav-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.btn-secondary {
+  background: var(--bg-light);
+  color: var(--text-dark);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-full);
+  padding: 8px 16px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-secondary:active { background: var(--border); }
+
+.word-count-label {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-light);
+}
+
+/* ================================================
+   BUILD WORD GAME STYLES
+   ================================================ */
+
+.build-game-board {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.build-image-frame {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--bg-light);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  width: 100%;
+}
+
+.build-emoji {
+  font-size: 60px;
+}
+
+.build-hint {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-medium);
+}
+
+.build-slots-container {
+  display: flex;
+  gap: 10px;
+}
+
+.build-slot {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-md);
+  border: 3px dashed var(--primary-blue);
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--text-dark);
+  transition: all 0.2s;
+}
+
+.build-slot.filled {
+  border-style: solid;
+  background: var(--primary-blue-light);
+  color: var(--primary-blue-dark);
+}
+
+.build-slot.correct {
+  border-color: #22C55E;
+  background: #DCFCE7;
+  color: #15803D;
+}
+
+.build-slot.wrong {
+  border-color: #EF4444;
+  background: #FEE2E2;
+  color: #B91C1C;
+}
+
+.build-options-grid {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.build-syllable-btn {
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--border);
+  background: white;
+  font-family: 'Nunito', sans-serif;
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--text-dark);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.build-syllable-btn:active {
+  transform: scale(0.92);
+}
+
+.build-feedback-msg {
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.build-feedback-msg.correct {
+  background: #DCFCE7;
+  color: #15803D;
+  border: 1.5px solid #86EFAC;
+}
+
+.build-feedback-msg.wrong {
+  background: #FEE2E2;
+  color: #B91C1C;
+  border: 1.5px solid #FCA5A5;
+}
+
+.btn-reset-build {
+  background: transparent;
+  border: none;
+  color: var(--text-light);
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* ================================================
+   MIC WORD GAME STYLES
+   ================================================ */
+
+.mic-game-board {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.mic-target-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--bg-light);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  width: 100%;
+  border: 2px solid var(--border);
+}
+
+.mic-card-emoji {
+  font-size: 64px;
+}
+
+.mic-syllables-display {
+  display: flex;
+  gap: 12px;
+  margin: 12px 0;
+}
+
+.mic-syllable-box {
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--border);
+  background: white;
+  font-size: 26px;
+  font-weight: 900;
+  color: var(--text-light);
+  transition: all 0.2s;
+}
+
+.mic-syllable-box.active-target {
+  border-color: var(--primary-blue);
+  background: var(--primary-blue);
+  color: white;
+  transform: scale(1.15);
+  box-shadow: 0 4px 14px rgba(26, 111, 224, 0.4);
+}
+
+.mic-syllable-box.completed {
+  border-color: #22C55E;
+  background: #DCFCE7;
+  color: #15803D;
+}
+
+.mic-instruction-text {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-dark);
+}
+
+.mic-feedback-banner {
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 800;
+  width: 100%;
+  text-align: center;
+}
+
+.mic-feedback-banner.success {
+  background: #DCFCE7;
+  color: #15803D;
+  border: 1.5px solid #86EFAC;
+}
+
+.mic-feedback-banner.error {
+  background: #FEE2E2;
+  color: #B91C1C;
+  border: 1.5px solid #FCA5A5;
+}
+
+/* ================================================
+   LECTURA DE CUENTOS Y ORACIONES STYLES
+   ================================================ */
+
+.lectura-cuentos-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cuentos-type-selector {
+  display: flex;
+  gap: 8px;
+  background: var(--bg-light);
+  padding: 6px;
+  border-radius: var(--radius-md);
+}
+
+.cuentos-type-btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: transparent;
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-medium);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.cuentos-type-btn.active {
+  background: var(--bg-card);
+  color: var(--primary-blue);
+  box-shadow: var(--shadow-sm);
+}
+
+.reading-frame {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: var(--bg-light);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+}
+
+.reading-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.reading-emoji {
+  font-size: 56px;
+}
+
+.reading-title {
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--text-dark);
+  text-align: center;
+}
+
+.reading-badge {
+  background: #FEF3C7;
+  color: #92400E;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+}
+
+.reading-instruction {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-light);
+  text-align: center;
+}
+
+.reading-words-box {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  justify-content: center;
+  background: white;
+  padding: 18px;
+  border-radius: var(--radius-md);
+  border: 2px solid #E2E8F0;
+  min-height: 90px;
+  align-items: center;
+}
+
+.word-interactive {
+  background: transparent;
+  border: 1.5px solid transparent;
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-dark);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.word-interactive:hover {
+  background: var(--primary-blue-light);
+  border-color: #BFDBFE;
+}
+
+.word-interactive.highlighted {
+  background: #FFD600;
+  color: var(--text-dark);
+  border-color: #EAB308;
+  transform: scale(1.15);
+  box-shadow: 0 4px 12px rgba(234, 179, 8, 0.4);
+}
+
+.reading-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.btn-play-full {
+  font-size: 16px;
+  padding: 14px 24px;
+}
+
+.btn-play-full.playing {
+  background: #EF4444;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+.reading-mic-challenge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: #EFF6FF;
+  border: 1.5px solid #BFDBFE;
+  border-radius: var(--radius-md);
+  padding: 14px;
+}
+
+.mic-challenge-title {
+  font-size: 15px;
+  font-weight: 900;
+  color: var(--primary-blue-dark);
+}
+
+.mic-challenge-desc {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-medium);
+  text-align: center;
+}
+
+

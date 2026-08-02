@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { speakText } from './speechUtils';
 
 const AppContext = createContext(null);
 
@@ -99,7 +100,20 @@ export function AppProvider({ children }) {
     catch { return {}; }
   });
 
+  const [voiceGender, setVoiceGender] = useState(() => {
+    try { return localStorage.getItem('adl_voice_gender') || 'male'; }
+    catch { return 'male'; }
+  });
+
   const [currentLevel, setCurrentLevel] = useState(1);
+
+  useEffect(() => {
+    localStorage.setItem('adl_voice_gender', voiceGender);
+  }, [voiceGender]);
+
+  const speak = useCallback((text, slow = false) => {
+    speakText(text, voiceGender, slow);
+  }, [voiceGender]);
 
   useEffect(() => {
     if (user) localStorage.setItem('adl_user', JSON.stringify(user));
@@ -173,6 +187,8 @@ export function AppProvider({ children }) {
       getCurrentLevel,
       getXpPercent,
       getPlayerLevel,
+      voiceGender, setVoiceGender,
+      speak,
     }}>
       {children}
     </AppContext.Provider>

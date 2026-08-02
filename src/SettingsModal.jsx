@@ -2,11 +2,20 @@ import React from 'react';
 import { useApp } from './AppContext';
 
 export function SettingsModal({ onClose }) {
-  const { user, profile, logout } = useApp();
+  const { user, profile, logout, voiceGender, setVoiceGender, speak } = useApp();
 
   const handleLogout = () => {
     logout();
     onClose();
+  };
+
+  const handleSelectVoice = (gender) => {
+    setVoiceGender(gender);
+    const msg = gender === 'female' ? '¡Hola! Soy la voz femenina.' : '¡Hola! Soy la voz masculina.';
+    // Small timeout so state updates
+    setTimeout(() => {
+      speak(msg);
+    }, 50);
   };
 
   return (
@@ -36,12 +45,32 @@ export function SettingsModal({ onClose }) {
           </span>
         </div>
 
-        <div className="settings-item">
-          <span className="settings-item-label">🔊 Voz</span>
-          <span className="settings-item-value">Activada</span>
+        {/* Voice Selector */}
+        <div className="settings-item-col">
+          <span className="settings-item-label">🎙️ Selección de Voz</span>
+          <div className="voice-selector-grid">
+            <button
+              className={`voice-select-btn ${voiceGender === 'male' ? 'active' : ''}`}
+              onClick={() => handleSelectVoice('male')}
+            >
+              👨 Masculina
+            </button>
+            <button
+              className={`voice-select-btn ${voiceGender === 'female' ? 'active' : ''}`}
+              onClick={() => handleSelectVoice('female')}
+            >
+              👩 Femenina
+            </button>
+          </div>
+          <button
+            className="voice-test-btn"
+            onClick={() => speak(voiceGender === 'female' ? '¡Hola! Esta es la voz femenina.' : '¡Hola! Esta es la voz masculina.')}
+          >
+            🔊 Probar Voz ({voiceGender === 'female' ? 'Femenina' : 'Masculina'})
+          </button>
         </div>
 
-        <div className="settings-item">
+        <div className="settings-item" style={{ marginTop: 8 }}>
           <span className="settings-item-label">🌐 Idioma</span>
           <span className="settings-item-value">Español</span>
         </div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useApp } from './AppContext';
+import { SpeechMicButton } from './SpeechMicButton';
 
 // Comprehensive Game Data derived from materials
 const ALL_GAME_DATA = [
@@ -184,19 +185,8 @@ function CelebrationModal({ stars, onContinue }) {
   );
 }
 
-function speak(text) {
-  if ('speechSynthesis' in window) {
-    window.speechSynthesis.cancel();
-    const utt = new SpeechSynthesisUtterance(text);
-    utt.lang = 'es-ES';
-    utt.rate = 0.8;
-    utt.pitch = 1.1;
-    window.speechSynthesis.speak(utt);
-  }
-}
-
 export function GameScreen({ level, onComplete }) {
-  const { completeLevel, recordMistake, mistakes } = useApp();
+  const { completeLevel, recordMistake, mistakes, speak } = useApp();
   const [questionIndex, setQuestionIndex] = useState(0);
   const [selected, setSelected] = useState(null);
   const [feedback, setFeedback] = useState(null); // 'correct' | 'wrong'
@@ -368,6 +358,23 @@ export function GameScreen({ level, onComplete }) {
               </button>
             );
           })}
+        </div>
+
+        {/* Speech Microphone Option */}
+        <div className="game-mic-section">
+          <p className="game-mic-hint">🎙️ ¿Quieres responder con el micrófono?</p>
+          <SpeechMicButton
+            targetText={current.answer}
+            disabled={!!feedback && feedback === 'correct'}
+            onResult={(res) => {
+              if (res.success) {
+                handleSelect(current.answer);
+              } else if (res.text) {
+                // If wrong speech, simulate selecting an incorrect option or showing feedback
+                handleSelect(res.normalized || 'WRONG');
+              }
+            }}
+          />
         </div>
 
         {/* Feedback text */}
