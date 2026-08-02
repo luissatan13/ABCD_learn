@@ -25,6 +25,7 @@ const VOWELS = ['A', 'E', 'I', 'O', 'U'];
 
 export function LecturaSilabica() {
   const { completeLevel, speak } = useApp();
+  const speakSyllable = (text, slow = true) => speak(text, slow);
   const [activeTab, setActiveTab] = useState('taller'); // 'taller' | 'construye' | 'microfono'
 
   // State for Taller (Consonant + Vowel grid)
@@ -237,7 +238,7 @@ export function LecturaSilabica() {
 
           <div className="word-decom-card">
             <div className="word-decom-emoji">{currentTallerWord.emoji}</div>
-            
+
             {/* Interactive Syllable Chips */}
             <div className="syllable-chips-row">
               {currentTallerWord.syllables.map((syllable, idx) => (
@@ -355,7 +356,7 @@ export function LecturaSilabica() {
           <div className="mic-game-board">
             <div className="mic-target-card">
               <span className="mic-card-emoji">{currentMicWord.emoji}</span>
-              
+
               {/* Syllables row with active highlight */}
               <div className="mic-syllables-display">
                 {currentMicWord.syllables.map((syl, idx) => (
