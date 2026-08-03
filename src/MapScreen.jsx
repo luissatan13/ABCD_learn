@@ -10,11 +10,21 @@ export function MapScreen({ onPlayLevel }) {
   const targetNodeRef = useRef(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
+    // Función para centrar el nivel en la pantalla
+    const scrollToNivel = (behavior = 'auto') => {
       if (targetNodeRef.current) {
-        targetNodeRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        targetNodeRef.current.scrollIntoView({ behavior, block: 'center' });
       }
-    }, 100);
+    };
+
+    // Intento 1: Inmediato (rápido sin animación)
+    scrollToNivel('auto');
+
+    // Intento 2: Diferido (por si tardan en cargar las imágenes o estilos)
+    const timer = setTimeout(() => {
+      scrollToNivel('smooth');
+    }, 350);
+
     return () => clearTimeout(timer);
   }, [targetLevelId]);
 
