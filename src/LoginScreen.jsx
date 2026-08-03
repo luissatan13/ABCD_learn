@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from './AppContext';
-import { useGoogleLogin } from '@react-oauth/google';
+import { signInWithPopup } from 'firebase/auth';
+import { auth, provider } from './firebase';
 
 // Google SVG Logo
 const GoogleLogo = () => (
@@ -26,31 +27,25 @@ export function LoginScreen({ onLoginSuccess }) {
   const { login } = useApp();
   const [loading, setLoading] = useState(false);
 
-  const handleGoogleLogin = useGoogleLogin({
-    onSuccess: async (tokenResponse) => {
-      setLoading(true);
-      try {
-        const userInfo = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-          headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
-        }).then(res => res.json());
+  const handleGoogleLogin = () => {
+    setLoading(true);
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        const userInfo = result.user;
         login({
-          name: userInfo.name || 'Papá / Mamá',
+          name: userInfo.displayName || 'Papá / Mamá',
           email: userInfo.email,
-          picture: userInfo.picture || '/owl_mascot.png',
-          sub: userInfo.sub,
+          picture: userInfo.photoURL || '/owl_mascot.png',
+          sub: userInfo.uid,
         });
         setLoading(false);
         onLoginSuccess();
-      } catch (err) {
-        console.error('Failed to fetch user info', err);
+      })
+      .catch((error) => {
+        console.error('Login Failed', error);
         setLoading(false);
-      }
-    },
-    onError: () => {
-      console.error('Login Failed');
-      setLoading(false);
-    },
-  });
+      });
+  };
 
   return (
     <div className="login-screen">

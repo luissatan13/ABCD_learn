@@ -1,70 +1,89 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useApp } from './AppContext';
 
 export function MapScreen({ onPlayLevel }) {
   const { levels } = useApp();
   const currentLevel = levels.find(l => l.status === 'current');
+  const lastCompleted = [...levels].reverse().find(l => l.status === 'completed');
+  const targetLevelId = currentLevel ? currentLevel.id : (lastCompleted ? lastCompleted.id : levels[0]?.id);
+
+  const targetNodeRef = useRef(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (targetNodeRef.current) {
+        targetNodeRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [targetLevelId]);
 
   return (
     <div className="screen">
       <div className="scroll-area">
         <div className="map-content">
           {/* Render levels in reverse (top = locked, bottom = done) */}
-          {[...levels].reverse().map((level, index, arr) => (
-            <React.Fragment key={level.id}>
-              {/* Level node */}
-              <div className="map-level-node">
+          {[...levels].reverse().map((level, index, arr) => {
+            const isTarget = level.id === targetLevelId;
+            return (
+              <React.Fragment key={level.id}>
+                {/* Level node */}
                 <div
-                  className={`level-circle ${level.status}`}
-                  id={`level-node-${level.id}`}
-                  onClick={() => level.status !== 'locked' && onPlayLevel(level)}
-                  role={level.status !== 'locked' ? 'button' : undefined}
-                  aria-label={`Nivel ${level.id}: ${level.label} - ${level.status === 'locked' ? 'Bloqueado' : level.status === 'completed' ? 'Completado' : 'Jugar ahora'}`}
+                  className="map-level-node"
+                  ref={isTarget ? targetNodeRef : null}
                 >
-                  {level.status === 'locked' && <span className="level-lock-icon">🔒</span>}
-                  {level.status === 'completed' && <span className="level-check-icon">✓</span>}
-                  {level.status === 'current' && (
-                    <>
-                      <span className="level-play-icon">▶</span>
-                      <div className="level-stars-decoration">
-                        <span className="star-deco red">★</span>
-                        <span className="star-deco blue">★</span>
-                      </div>
-                    </>
+                  <div
+                    className={`level-circle ${level.status}`}
+                    id={`level-node-${level.id}`}
+                    onClick={() => level.status !== 'locked' && onPlayLevel(level)}
+                    role={level.status !== 'locked' ? 'button' : undefined}
+                    aria-label={`Nivel ${level.id}: ${level.label} - ${level.status === 'locked' ? 'Bloqueado' : level.status === 'completed' ? 'Completado' : 'Jugar ahora'}`}
+                  >
+                    {level.status === 'locked' && <span className="level-lock-icon">🔒</span>}
+                    {level.status === 'completed' && <span className="level-check-icon">✓</span>}
+                    {level.status === 'current' && (
+                      <>
+                        <span className="level-play-icon">▶</span>
+                        <div className="level-stars-decoration">
+                          <span className="star-deco red">★</span>
+                          <span className="star-deco blue">★</span>
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  <span className="level-label">
+                    {level.status === 'locked' ? `Nivel ${level.id}: ${level.label}` : level.label}
+                  </span>
+
+                  {level.status === 'completed' && (
+                    <div className="level-stars" aria-label={`${level.stars} estrellas`}>
+                      {[1, 2, 3].map(s => (
+                        <span key={s} style={{ color: s <= level.stars ? '#F5C800' : '#D4CDB8' }}>★</span>
+                      ))}
+                    </div>
                   )}
                 </div>
 
-                <span className="level-label">
-                  {level.status === 'locked' ? `Nivel ${level.id}: ${level.label}` : level.label}
-                </span>
-
-                {level.status === 'completed' && (
-                  <div className="level-stars" aria-label={`${level.stars} estrellas`}>
-                    {[1, 2, 3].map(s => (
-                      <span key={s} style={{ color: s <= level.stars ? '#F5C800' : '#D4CDB8' }}>★</span>
-                    ))}
-                  </div>
+                {/* Play button for current level */}
+                {level.status === 'current' && (
+                  <button
+                    id="map-play-btn"
+                    className="map-play-btn"
+                    onClick={() => onPlayLevel(level)}
+                    aria-label={`Jugar nivel ${level.label}`}
+                  >
+                    ¡Jugar Ahora!
+                  </button>
                 )}
-              </div>
 
-              {/* Play button for current level */}
-              {level.status === 'current' && (
-                <button
-                  id="map-play-btn"
-                  className="map-play-btn"
-                  onClick={() => onPlayLevel(level)}
-                  aria-label={`Jugar nivel ${level.label}`}
-                >
-                  ¡Jugar Ahora!
-                </button>
-              )}
-
-              {/* Connector */}
-              {index < arr.length - 1 && (
-                <div className="map-level-connector" aria-hidden="true" />
-              )}
-            </React.Fragment>
-          ))}
+                {/* Connector */}
+                {index < arr.length - 1 && (
+                  <div className="map-level-connector" aria-hidden="true" />
+                )}
+              </React.Fragment>
+            );
+          })}
 
           {/* Treehouse at bottom */}
           <div className="map-level-connector" aria-hidden="true" />
