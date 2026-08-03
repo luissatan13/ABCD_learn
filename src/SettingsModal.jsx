@@ -1,21 +1,68 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useApp } from './AppContext';
+import { getSpanishVoices, getAllVoices, previewVoice, stopSpeech } from './speechUtils';
+
+const SPEED_LABELS = ['🐢 Muy Lenta', '🐌 Lenta', '🐇 Normal', '⚡ Rápida'];
+
+const VOICE_TYPES = [
+  { id: 'male',   label: '👨 Masculina' },
+  { id: 'female', label: '👩 Femenina'  },
+  { id: 'child',  label: '🧒 Niño/a'   },
+];
 
 export function SettingsModal({ onClose }) {
-  const { user, profile, logout, voiceGender, setVoiceGender, speak } = useApp();
+  const {
+    user, profile, logout,
+    voiceGender, setVoiceGender,
+    voiceName, setVoiceName,
+    readSpeed, setReadSpeed,
+    speak,
+  } = useApp();
 
-  const handleLogout = () => {
-    logout();
-    onClose();
+  const [voices, setVoices] = useState([]);
+  const [showAllVoices, setShowAllVoices] = useState(false);
+  const [previewingVoice, setPreviewingVoice] = useState(null);
+
+  // Load voices on mount (they may not be ready yet)
+  const loadVoices = useCallback(() => {
+    const spanish = getSpanishVoices();
+    const all = getAllVoices();
+    setVoices(showAllVoices ? all : spanish);
+  }, [showAllVoices]);
+
+  useEffect(() => {
+    loadVoices();
+    // Some browsers fire voiceschanged after a short delay
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+    return () => {
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        window.speechSynthesis.onvoiceschanged = null;
+      }
+    };
+  }, [loadVoices]);
+
+  const handleLogout = () => { logout(); onClose(); };
+
+  const handleSelectVoiceType = (type) => {
+    setVoiceGender(type);
+    setVoiceName(null); // reset specific voice — auto pick by gender
+    setTimeout(() => speak('¡Hola! Esta es tu nueva voz.'), 80);
   };
 
-  const handleSelectVoice = (gender) => {
-    setVoiceGender(gender);
-    const msg = gender === 'female' ? '¡Hola! Soy la voz femenina.' : '¡Hola! Soy la voz masculina.';
-    // Small timeout so state updates
+  const handlePreviewVoice = (e, vName) => {
+    e.stopPropagation();
+    setPreviewingVoice(vName);
+    previewVoice(vName, voiceGender);
+    setTimeout(() => setPreviewingVoice(null), 3000);
+  };
+
+  const handleSelectSpecificVoice = (vName) => {
+    setVoiceName(vName);
     setTimeout(() => {
-      speak(msg);
-    }, 50);
+      previewVoice(vName, voiceGender);
+    }, 60);
   };
 
   return (
@@ -27,52 +74,146 @@ export function SettingsModal({ onClose }) {
       aria-label="Configuración"
       id="settings-modal"
     >
-      <div
-        className="settings-sheet"
-        onClick={e => e.stopPropagation()}
-      >
+      <div className="settings-sheet" onClick={e => e.stopPropagation()}>
+
+        {/* Drag handle */}
+        <div className="settings-drag-handle" />
+
         <h2 className="settings-title">⚙️ Configuración</h2>
 
-        <div className="settings-item">
-          <span className="settings-item-label">👤 Explorador</span>
-          <span className="settings-item-value">{profile?.name || 'Sin nombre'}</span>
+        {/* Profile info */}
+        <div className="settings-section">
+          <div className="settings-section-title">Cuenta</div>
+          <div className="settings-row">
+            <span className="settings-row-label">👤 Explorador</span>
+            <span className="settings-row-value">{profile?.name || 'Sin nombre'}</span>
+          </div>
+          <div className="settings-row">
+            <span className="settings-row-label">📧 Email</span>
+            <span className="settings-row-value" style={{ fontSize: 12 }}>
+              {user?.email || 'No conectado'}
+            </span>
+          </div>
         </div>
 
-        <div className="settings-item">
-          <span className="settings-item-label">📧 Cuenta</span>
-          <span className="settings-item-value" style={{ fontSize: 12 }}>
-            {user?.email || 'No conectado'}
-          </span>
-        </div>
+        {/* Voice type selector */}
+        <div className="settings-section">
+          <div className="settings-section-title">🎙️ Tipo de Voz</div>
+          <div className="voice-type-row">
+            {VOICE_TYPES.map(t => (
+              <button
+                key={t.id}
+                className={`voice-type-pill ${voiceGender === t.id ? 'active' : ''}`}
+                onClick={() => handleSelectVoiceType(t.id)}
+                id={`voice-type-${t.id}`}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
 
-        {/* Voice Selector */}
-        <div className="settings-item-col">
-          <span className="settings-item-label">🎙️ Selección de Voz</span>
-          <div className="voice-selector-grid">
+          {/* Voice list */}
+          <div className="settings-section-title" style={{ marginTop: 12 }}>
+            Voz del sistema
             <button
-              className={`voice-select-btn ${voiceGender === 'male' ? 'active' : ''}`}
-              onClick={() => handleSelectVoice('male')}
+              onClick={() => setShowAllVoices(v => !v)}
+              style={{
+                marginLeft: 8, background: 'none', border: 'none',
+                color: 'var(--cyan)', fontSize: 11, fontWeight: 800,
+                cursor: 'pointer', fontFamily: 'Nunito, sans-serif',
+              }}
             >
-              👨 Masculina
-            </button>
-            <button
-              className={`voice-select-btn ${voiceGender === 'female' ? 'active' : ''}`}
-              onClick={() => handleSelectVoice('female')}
-            >
-              👩 Femenina
+              {showAllVoices ? '← Solo español' : 'Ver todas →'}
             </button>
           </div>
-          <button
-            className="voice-test-btn"
-            onClick={() => speak(voiceGender === 'female' ? '¡Hola! Esta es la voz femenina.' : '¡Hola! Esta es la voz masculina.')}
-          >
-            🔊 Probar Voz ({voiceGender === 'female' ? 'Femenina' : 'Masculina'})
-          </button>
+
+          <div className="voice-list" role="listbox" aria-label="Lista de voces disponibles">
+            {voices.length === 0 ? (
+              <div className="voice-empty">
+                No se encontraron voces en este dispositivo.<br />
+                <small>Instala voces en español en la configuración del sistema.</small>
+              </div>
+            ) : (
+              voices.map(v => {
+                const isSelected = voiceName ? voiceName === v.name : false;
+                const isOnline = !v.localService;
+                return (
+                  <div
+                    key={v.name}
+                    className={`voice-list-item ${isSelected ? 'selected' : ''}`}
+                    role="option"
+                    aria-selected={isSelected}
+                    onClick={() => handleSelectSpecificVoice(v.name)}
+                  >
+                    <div className="voice-list-dot" />
+                    <div className="voice-list-info">
+                      <div className="voice-list-name">{v.name}</div>
+                      <div className="voice-list-lang">{v.lang}</div>
+                    </div>
+                    {isOnline && (
+                      <span className="voice-list-quality">HD</span>
+                    )}
+                    <button
+                      className="voice-preview-btn"
+                      onClick={e => handlePreviewVoice(e, v.name)}
+                      aria-label={`Probar voz ${v.name}`}
+                      title="Probar esta voz"
+                    >
+                      {previewingVoice === v.name ? '⏸' : '▶'}
+                    </button>
+                  </div>
+                );
+              })
+            )}
+          </div>
+
+          {voiceName && (
+            <button
+              style={{
+                width: '100%', padding: '8px', background: 'none', border: 'none',
+                color: 'var(--text-muted)', fontSize: 12, fontWeight: 700,
+                cursor: 'pointer', fontFamily: 'Nunito, sans-serif',
+              }}
+              onClick={() => { setVoiceName(null); setTimeout(() => speak('Voz automática activada.'), 60); }}
+            >
+              ↩ Restablecer a automático
+            </button>
+          )}
         </div>
 
-        <div className="settings-item" style={{ marginTop: 8 }}>
-          <span className="settings-item-label">🌐 Idioma</span>
-          <span className="settings-item-value">Español</span>
+        {/* Read speed */}
+        <div className="settings-section">
+          <div className="settings-section-title">⚡ Velocidad de Lectura</div>
+          <div style={{ padding: '12px 16px', background: 'var(--bg-glass)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)' }}>
+            <div style={{ textAlign: 'center', marginBottom: 12 }}>
+              <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-bright)' }}>
+                {SPEED_LABELS[readSpeed]}
+              </span>
+            </div>
+            <div className="speed-slider-row">
+              <span className="speed-label" style={{ fontSize: 18 }}>🐢</span>
+              <input
+                className="speed-slider"
+                type="range"
+                min={0}
+                max={3}
+                step={1}
+                value={readSpeed}
+                onChange={e => setReadSpeed(Number(e.target.value))}
+                aria-label="Velocidad de lectura"
+                id="speed-slider"
+              />
+              <span className="speed-label" style={{ fontSize: 18 }}>⚡</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Language */}
+        <div className="settings-section">
+          <div className="settings-row">
+            <span className="settings-row-label">🌐 Idioma</span>
+            <span className="settings-row-value">Español</span>
+          </div>
         </div>
 
         <button
@@ -81,7 +222,7 @@ export function SettingsModal({ onClose }) {
           onClick={handleLogout}
           aria-label="Cerrar sesión"
         >
-          Cerrar Sesión
+          🚪 Cerrar Sesión
         </button>
       </div>
     </div>

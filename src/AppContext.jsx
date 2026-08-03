@@ -68,14 +68,11 @@ export function AppProvider({ children }) {
       if (saved && Array.isArray(saved) && saved.length === INITIAL_LEVELS.length) {
         return saved;
       }
-      // If old version stored fewer levels, merge completed status
       if (saved && Array.isArray(saved) && saved.length > 0) {
         const savedMap = new Map(saved.map(l => [l.id, l]));
         return INITIAL_LEVELS.map(initL => {
           const s = savedMap.get(initL.id);
-          if (s) {
-            return { ...initL, status: s.status, stars: s.stars };
-          }
+          if (s) return { ...initL, status: s.status, stars: s.stars };
           return initL;
         });
       }
@@ -100,20 +97,37 @@ export function AppProvider({ children }) {
     catch { return {}; }
   });
 
+  // ---- Voice settings ----
   const [voiceGender, setVoiceGender] = useState(() => {
     try { return localStorage.getItem('adl_voice_gender') || 'male'; }
     catch { return 'male'; }
   });
 
+  // Specific system voice name (null = auto pick by gender)
+  const [voiceName, setVoiceName] = useState(() => {
+    try { return localStorage.getItem('adl_voice_name') || null; }
+    catch { return null; }
+  });
+
+  // Read speed: 0=very slow, 1=slow, 2=normal, 3=fast
+  const [readSpeed, setReadSpeed] = useState(() => {
+    try { return parseInt(localStorage.getItem('adl_read_speed')) || 2; }
+    catch { return 2; }
+  });
+
   const [currentLevel, setCurrentLevel] = useState(1);
 
+  // Persist voice settings
+  useEffect(() => { localStorage.setItem('adl_voice_gender', voiceGender); }, [voiceGender]);
   useEffect(() => {
-    localStorage.setItem('adl_voice_gender', voiceGender);
-  }, [voiceGender]);
+    if (voiceName) localStorage.setItem('adl_voice_name', voiceName);
+    else localStorage.removeItem('adl_voice_name');
+  }, [voiceName]);
+  useEffect(() => { localStorage.setItem('adl_read_speed', readSpeed.toString()); }, [readSpeed]);
 
   const speak = useCallback((text, slow = false) => {
-    speakText(text, voiceGender, slow);
-  }, [voiceGender]);
+    speakText(text, voiceGender, slow, voiceName, readSpeed);
+  }, [voiceGender, voiceName, readSpeed]);
 
   useEffect(() => {
     if (user) localStorage.setItem('adl_user', JSON.stringify(user));
@@ -139,18 +153,9 @@ export function AppProvider({ children }) {
     localStorage.setItem('adl_mistakes', JSON.stringify(mistakes));
   }, [mistakes]);
 
-  const login = (googleUser) => {
-    setUser(googleUser);
-  };
-
-  const logout = () => {
-    setUser(null);
-    setProfile(null);
-  };
-
-  const saveProfile = (profileData) => {
-    setProfile(profileData);
-  };
+  const login = (googleUser) => { setUser(googleUser); };
+  const logout = () => { setUser(null); setProfile(null); };
+  const saveProfile = (profileData) => { setProfile(profileData); };
 
   const completeLevel = (levelId, stars) => {
     setLevels(prev => {
@@ -168,7 +173,7 @@ export function AppProvider({ children }) {
   const recordMistake = (targetItem) => {
     setMistakes(prev => ({
       ...prev,
-      [targetItem]: (prev[targetItem] || 0) + 1
+      [targetItem]: (prev[targetItem] || 0) + 1,
     }));
   };
 
@@ -188,6 +193,8 @@ export function AppProvider({ children }) {
       getXpPercent,
       getPlayerLevel,
       voiceGender, setVoiceGender,
+      voiceName, setVoiceName,
+      readSpeed, setReadSpeed,
       speak,
     }}>
       {children}

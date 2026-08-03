@@ -12,6 +12,16 @@ const GoogleLogo = () => (
   </svg>
 );
 
+// Generate random star positions (stable — computed once outside component)
+const STARS = Array.from({ length: 50 }, (_, i) => ({
+  id: i,
+  top:      `${(i * 7.3 + 3) % 100}%`,
+  left:     `${(i * 13.7 + 5) % 100}%`,
+  size:     (i % 3) + 1.5,
+  duration: `${(i % 3) + 2}s`,
+  delay:    `${(i % 5) * 0.7}s`,
+}));
+
 export function LoginScreen({ onLoginSuccess }) {
   const { login } = useApp();
   const [loading, setLoading] = useState(false);
@@ -23,7 +33,6 @@ export function LoginScreen({ onLoginSuccess }) {
         const userInfo = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
           headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
         }).then(res => res.json());
-        
         login({
           name: userInfo.name || 'Papá / Mamá',
           email: userInfo.email,
@@ -33,30 +42,59 @@ export function LoginScreen({ onLoginSuccess }) {
         setLoading(false);
         onLoginSuccess();
       } catch (err) {
-        console.error("Failed to fetch user info", err);
+        console.error('Failed to fetch user info', err);
         setLoading(false);
       }
     },
     onError: () => {
       console.error('Login Failed');
       setLoading(false);
-    }
+    },
   });
 
   return (
     <div className="login-screen">
+      {/* Animated star field */}
+      <div className="login-stars" aria-hidden="true">
+        {STARS.map(s => (
+          <div
+            key={s.id}
+            className="login-star"
+            style={{
+              top:               s.top,
+              left:              s.left,
+              width:             `${s.size}px`,
+              height:            `${s.size}px`,
+              animationDuration: s.duration,
+              animationDelay:    s.delay,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Glowing ambient orbs */}
+      <div className="login-orb login-orb-1" aria-hidden="true" />
+      <div className="login-orb login-orb-2" aria-hidden="true" />
+      <div className="login-orb login-orb-3" aria-hidden="true" />
+
+      {/* Mascot */}
       <div className="login-mascot-container">
         <div className="login-mascot-card">
           <img src="/owl_mascot.png" alt="Búho explorador mascota de Aventura de Leer" />
         </div>
       </div>
 
+      {/* Headline */}
       <div className="login-text">
-        <h1 className="login-title">¡Hola, Pequeño<br />Explorador!</h1>
-        <p className="login-subtitle">¿Listo para tu aventura mágica de lectura?</p>
+        <h1 className="login-title">
+          ¡Hola, Pequeño<br />
+          <span>Explorador!</span>
+        </h1>
+        <p className="login-subtitle">¿Listo para tu aventura mágica de lectura? ✨</p>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: '100%', maxWidth: 300 }}>
+      {/* Auth buttons */}
+      <div className="login-buttons">
         <button
           id="google-login-btn"
           className="google-btn"
@@ -65,7 +103,7 @@ export function LoginScreen({ onLoginSuccess }) {
           aria-label="Continuar con Google"
         >
           {loading ? (
-            <span style={{ fontSize: 16 }}>⏳ Entrando...</span>
+            <span style={{ fontSize: 15 }}>⏳ Entrando...</span>
           ) : (
             <>
               <GoogleLogo />
@@ -76,7 +114,7 @@ export function LoginScreen({ onLoginSuccess }) {
 
         <button
           id="guest-login-btn"
-          className="btn-primary"
+          className="btn-primary btn-gold"
           onClick={() => {
             login({
               name: 'Invitado',
@@ -86,7 +124,6 @@ export function LoginScreen({ onLoginSuccess }) {
             });
             onLoginSuccess();
           }}
-          style={{ background: 'var(--gold-btn)', color: 'var(--text-dark)' }}
           aria-label="Entrar como Invitado"
         >
           🎮 Entrar como Invitado
