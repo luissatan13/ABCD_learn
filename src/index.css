@@ -2547,3 +2547,74 @@ button[id^="alphabet-"]:active { transform: scale(0.92) !important; }
 .name-input {
   text-align: center;
 }
+
+
+/* ================================================================
+   UNICORN THEME (PASTEL LIGHT MODE)
+   ================================================================ */
+#root.theme-unicorn {
+  --bg:              #FFF0F5;
+  --bg-2:            #FFE4E1;
+  --bg-card:         #FFFFFF;
+  --bg-card-2:       #FFF5FA;
+  --bg-glass:        rgba(236,72,153,0.06);
+  --bg-glass-strong: rgba(236,72,153,0.12);
+  --purple:          #EC4899;
+  --purple-light:    #F472B6;
+  --purple-dark:     #DB2777;
+  --cyan:            #A78BFA;
+  --cyan-light:      #C084FC;
+  --cyan-dark:       #8B5CF6;
+  --text-white:      #4D3E6B;
+  --text-bright:     #3B2F54;
+  --text-mid:        #7E6E9B;
+  --text-muted:      #A293BE;
+  --border:          rgba(236,72,153,0.15);
+  --border-strong:   rgba(236,72,153,0.25);
+}
+
+#root.theme-unicorn::before {
+  background:
+    radial-gradient(ellipse at 20% 10%, rgba(244,114,182,0.3) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 80%, rgba(167,139,250,0.3) 0%, transparent 60%),
+    radial-gradient(ellipse at 50% 50%, rgba(253,224,71,0.2) 0%, transparent 80%) !important;
+}
+
+#root.theme-unicorn .bottom-nav {
+  background: rgba(255, 255, 255, 0.85);
+  border-top: 1px solid rgba(236,72,153,0.2);
+  backdrop-filter: blur(20px);
+}
+
+#root.theme-unicorn .nav-pill svg path,
+#root.theme-unicorn .nav-pill svg circle,
+#root.theme-unicorn .nav-pill svg rect {
+  stroke: #7E6E9B;
+}
+
+#root.theme-unicorn .nav-item.active .nav-pill {
+  background: linear-gradient(135deg, #EC4899, #8B5CF6);
+}
+
+#root.theme-unicorn .nav-item.active .nav-pill svg path,
+#root.theme-unicorn .nav-item.active .nav-pill svg circle,
+#root.theme-unicorn .nav-item.active .nav-pill svg rect {
+  stroke: #FFFFFF;
+}
+
+#root.theme-unicorn .nav-label {
+  color: #7E6E9B;
+}
+
+#root.theme-unicorn .nav-item.active .nav-label {
+  color: #EC4899;
+}
+
+#root.theme-unicorn .settings-sheet {
+  background: #FFF0F5;
+  border-top: 2px solid rgba(236,72,153,0.3);
+}
+
+#root.theme-unicorn .settings-drag-handle {
+  background: rgba(236,72,153,0.3);
+}

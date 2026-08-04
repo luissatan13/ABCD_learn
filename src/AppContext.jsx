@@ -115,6 +115,11 @@ export function AppProvider({ children }) {
     catch { return 2; }
   });
 
+  const [theme, setTheme] = useState(() => {
+    try { return localStorage.getItem('adl_theme') || 'default'; }
+    catch { return 'default'; }
+  });
+
   const [currentLevel, setCurrentLevel] = useState(1);
 
   // Persist voice settings
@@ -124,6 +129,7 @@ export function AppProvider({ children }) {
     else localStorage.removeItem('adl_voice_name');
   }, [voiceName]);
   useEffect(() => { localStorage.setItem('adl_read_speed', readSpeed.toString()); }, [readSpeed]);
+  useEffect(() => { localStorage.setItem('adl_theme', theme); }, [theme]);
 
   const speak = useCallback((text, slow = false) => {
     speakText(text, voiceGender, slow, voiceName, readSpeed);
@@ -196,6 +202,7 @@ export function AppProvider({ children }) {
       voiceName, setVoiceName,
       readSpeed, setReadSpeed,
       speak,
+      theme, setTheme,
     }}>
       {children}
     </AppContext.Provider>

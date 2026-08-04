@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from './AppContext';
 import { LoginScreen } from './LoginScreen';
 import { ProfileScreen } from './ProfileScreen';
@@ -12,10 +12,24 @@ import { BottomNav } from './BottomNav';
 import { SettingsModal } from './SettingsModal';
 
 function App() {
-  const { user, profile } = useApp();
+  const { user, profile, theme } = useApp();
   const [activeTab, setActiveTab] = useState('mapa');
   const [showSettings, setShowSettings] = useState(false);
   const [currentGame, setCurrentGame] = useState(null); // level object
+
+  useEffect(() => {
+    const root = document.getElementById('root');
+    if (root) {
+      // Remove old theme classes
+      Array.from(root.classList).forEach(c => {
+        if (c.startsWith('theme-')) {
+          root.classList.remove(c);
+        }
+      });
+      // Add new theme class
+      root.classList.add(`theme-${theme}`);
+    }
+  }, [theme]);
 
   // ---- AUTH FLOW ----
   if (!user) {

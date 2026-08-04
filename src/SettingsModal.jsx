@@ -17,6 +17,7 @@ export function SettingsModal({ onClose }) {
     voiceName, setVoiceName,
     readSpeed, setReadSpeed,
     speak,
+    theme, setTheme,
   } = useApp();
 
   const [voices, setVoices] = useState([]);
@@ -205,6 +206,32 @@ export function SettingsModal({ onClose }) {
               />
               <span className="speed-label" style={{ fontSize: 18 }}>⚡</span>
             </div>
+          </div>
+        </div>
+
+        {/* Theme Selector */}
+        <div className="settings-section">
+          <div className="settings-section-title">🦄 Tema de la App</div>
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <button
+              className={`voice-type-pill ${theme === 'default' ? 'active' : ''}`}
+              onClick={() => setTheme('default')}
+              style={{ flex: 1, padding: '10px', fontSize: '13px' }}
+            >
+              🚀 Espacio (Oscuro)
+            </button>
+            <button
+              className={`voice-type-pill ${theme === 'unicorn' ? 'active' : ''}`}
+              onClick={() => setTheme('unicorn')}
+              style={{ 
+                flex: 1, 
+                padding: '10px', 
+                fontSize: '13px',
+                background: theme === 'unicorn' ? 'linear-gradient(135deg, var(--pink), var(--purple))' : ''
+              }}
+            >
+              🦄 Unicornio (Pastel)
+            </button>
           </div>
         </div>
 
