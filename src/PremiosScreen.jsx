@@ -14,11 +14,38 @@ const ALL_MEDALS = [
 ];
 
 export function PremiosScreen({ onGoToMap }) {
-  const { medals, getXpPercent, getPlayerLevel, xp, levels } = useApp();
-  const earnedIds = medals.filter(m => m.earned).map(m => m.id);
+  const { getXpPercent, getPlayerLevel, xp, levels } = useApp();
   const completedLevels = levels.filter(l => l.status === 'completed').length;
   const playerLevel = getPlayerLevel();
   const xpPercent = getXpPercent();
+
+  const isMedalEarned = (id) => {
+    const completed = levels.filter(l => l.status === 'completed');
+    const completedCount = completed.length;
+    
+    switch(id) {
+      case 'primera':
+        return levels.find(l => l.id === 1)?.status === 'completed';
+      case 'estrella':
+        return levels.some(l => l.stars === 3);
+      case 'rapido':
+        return levels.some(l => l.stars === 3);
+      case 'silaba':
+        return completed.some(l => l.type === 'silabas');
+      case 'lector':
+        return completedCount >= 3;
+      case 'explorador':
+        return completedCount >= 5;
+      case 'misterio':
+        return completedCount >= 8;
+      case 'maestro':
+        return completedCount === levels.length;
+      case 'campeon':
+        return completed.filter(l => l.stars === 3).length >= 5;
+      default:
+        return false;
+    }
+  };
 
   return (
     <div className="screen">
@@ -49,7 +76,7 @@ export function PremiosScreen({ onGoToMap }) {
 
           <div className="medallas-grid">
             {ALL_MEDALS.map(medal => {
-              const earned = earnedIds.includes(medal.id);
+              const earned = isMedalEarned(medal.id);
               return (
                 <div key={medal.id} className="medalla-item" id={`medal-${medal.id}`}>
                   <div
