@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useApp, AVATARS } from './AppContext';
 
 export function ProfileScreen({ onDone }) {
@@ -8,6 +8,7 @@ export function ProfileScreen({ onDone }) {
   );
   const [name, setName] = useState(profile?.name || 'Leo');
   const [editing, setEditing] = useState(false);
+  const fileInputRef = useRef(null);
 
   const handleSave = () => {
     if (!name.trim()) return;
@@ -43,9 +44,74 @@ export function ProfileScreen({ onDone }) {
                   )}
                 </button>
               ))}
-              <div className="avatar-add" aria-label="Añadir avatar personalizado">
+              {selectedAvatar.isCustom && (
+                <button
+                  key={selectedAvatar.id}
+                  id={`avatar-${selectedAvatar.id}`}
+                  className="avatar-option selected"
+                  onClick={() => setSelectedAvatar(selectedAvatar)}
+                  aria-label={`Avatar: ${selectedAvatar.label}`}
+                  aria-pressed={true}
+                >
+                  <img src={selectedAvatar.src} alt={selectedAvatar.label} />
+                  <div className="checkmark">✓</div>
+                </button>
+              )}
+              <div 
+                className="avatar-add" 
+                aria-label="Añadir avatar personalizado"
+                onClick={() => fileInputRef.current?.click()}
+              >
                 +
               </div>
+              <input 
+                type="file" 
+                accept="image/*" 
+                ref={fileInputRef} 
+                style={{ display: 'none' }} 
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                      const img = new Image();
+                      img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const MAX_SIZE = 150;
+                        let width = img.width;
+                        let height = img.height;
+                        if (width > height) {
+                          if (width > MAX_SIZE) {
+                            height *= MAX_SIZE / width;
+                            width = MAX_SIZE;
+                          }
+                        } else {
+                          if (height > MAX_SIZE) {
+                            width *= MAX_SIZE / height;
+                            height = MAX_SIZE;
+                          }
+                        }
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                        
+                        setSelectedAvatar({
+                          id: 'custom-' + Date.now(),
+                          src: dataUrl,
+                          label: 'Personalizado',
+                          isCustom: true
+                        });
+                      };
+                      img.src = reader.result;
+                    };
+                    reader.readAsDataURL(file);
+                  }
+                  // Reset input value so the same file can be selected again
+                  if (e.target) e.target.value = '';
+                }} 
+              />
             </div>
           </div>
 
