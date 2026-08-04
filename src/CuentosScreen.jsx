@@ -36,7 +36,6 @@ export function CuentosScreen() {
                 tabIndex={0}
               >
                 <div style={{ 
-                  fontSize: '48px', 
                   background: 'var(--bg-glass-strong)', 
                   borderRadius: '16px', 
                   width: '80px', 
@@ -44,9 +43,14 @@ export function CuentosScreen() {
                   display: 'flex', 
                   alignItems: 'center', 
                   justifyContent: 'center',
-                  flexShrink: 0
+                  flexShrink: 0,
+                  overflow: 'hidden'
                 }}>
-                  {story.coverEmoji}
+                  {story.coverImage ? (
+                    <img src={story.coverImage} alt={story.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    <span style={{ fontSize: '48px' }}>{story.coverEmoji}</span>
+                  )}
                 </div>
                 <div style={{ flex: 1 }}>
                   <h3 style={{ color: 'white', margin: '0 0 4px 0', fontSize: '18px' }}>{story.title}</h3>

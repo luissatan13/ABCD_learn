@@ -48,7 +48,6 @@ export function StoryReader({ story, onClose }) {
         
         {/* Emoji/Image Frame */}
         <div style={{ 
-          fontSize: '100px', 
           background: 'var(--bg-glass)', 
           width: '240px', 
           height: '240px', 
@@ -57,9 +56,14 @@ export function StoryReader({ story, onClose }) {
           justifyContent: 'center', 
           borderRadius: '24px',
           boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-          marginBottom: '32px'
+          marginBottom: '32px',
+          overflow: 'hidden'
         }}>
-          {page.emoji}
+          {page.image ? (
+            <img src={page.image} alt="Ilustración del cuento" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          ) : (
+            <span style={{ fontSize: '100px' }}>{page.emoji}</span>
+          )}
         </div>
 
         {/* Text */}
