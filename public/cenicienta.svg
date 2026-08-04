@@ -1,0 +1,173 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0F172A" /> <!-- Very deep night blue -->
+      <stop offset="50%" stop-color="#1E3A8A" /> <!-- Magical royal blue -->
+      <stop offset="100%" stop-color="#4A0E4E" /> <!-- Soft violet-magenta -->
+    </linearGradient>
+    
+    <!-- Hair Gradient -->
+    <linearGradient id="hairGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFE066" />
+      <stop offset="50%" stop-color="#F5B041" />
+      <stop offset="100%" stop-color="#D35400" />
+    </linearGradient>
+    
+    <!-- Skin Gradient -->
+    <linearGradient id="skinGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFF3E0" />
+      <stop offset="100%" stop-color="#FFCC80" />
+    </linearGradient>
+
+    <!-- Dress Gradient -->
+    <linearGradient id="dressGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#E0F2FE" />
+      <stop offset="50%" stop-color="#7DD3FC" />
+      <stop offset="100%" stop-color="#0284C7" />
+    </linearGradient>
+
+    <!-- Carriage Glow -->
+    <radialGradient id="carriageGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFF" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#FFF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" fill="url(#bgGrad)" rx="24" />
+
+  <!-- Stars / Sparkles in background -->
+  <g fill="#FFFFFF" opacity="0.8">
+    <!-- Star 1 -->
+    <path d="M 120 80 L 123 92 L 135 95 L 123 98 L 120 110 L 117 98 L 105 95 L 117 92 Z" />
+    <!-- Star 2 -->
+    <path d="M 400 120 L 402 128 L 410 130 L 402 132 L 400 140 L 398 132 L 390 130 L 398 128 Z" opacity="0.6"/>
+    <!-- Star 3 -->
+    <path d="M 320 60 L 324 75 L 339 79 L 324 83 L 320 98 L 316 83 L 301 79 L 316 75 Z" />
+    <!-- Star 4 -->
+    <path d="M 80 250 L 82 258 L 90 260 L 82 262 L 80 270 L 78 262 L 70 260 L 78 258 Z" opacity="0.5"/>
+    <!-- Small star points -->
+    <circle cx="150" cy="180" r="2" opacity="0.5"/>
+    <circle cx="250" cy="90" r="3" opacity="0.7"/>
+    <circle cx="370" cy="220" r="2" opacity="0.4"/>
+    <circle cx="450" cy="150" r="3" opacity="0.6"/>
+  </g>
+
+  <!-- Pumpkin Carriage on the right background -->
+  <g transform="translate(320, 240)">
+    <!-- Carriage glow -->
+    <circle cx="50" cy="30" r="100" fill="url(#carriageGlow)" />
+    
+    <!-- Wheels -->
+    <circle cx="-10" cy="80" r="30" fill="none" stroke="#F59E0B" stroke-width="4" />
+    <circle cx="-10" cy="80" r="10" fill="none" stroke="#F59E0B" stroke-width="2" />
+    <path d="M-10 50 L-10 110 M-40 80 L20 80" stroke="#F59E0B" stroke-width="2" />
+    
+    <circle cx="110" cy="80" r="30" fill="none" stroke="#F59E0B" stroke-width="4" />
+    <circle cx="110" cy="80" r="10" fill="none" stroke="#F59E0B" stroke-width="2" />
+    <path d="M110 50 L110 110 M80 80 L140 80" stroke="#F59E0B" stroke-width="2" />
+
+    <!-- Connection Bar -->
+    <path d="M-10 80 L110 80" stroke="#F59E0B" stroke-width="4" fill="none" />
+
+    <!-- Carriage Body (Pumpkin shape) -->
+    <path d="M 10 30 C -20 30, -35 50, -30 70 C -25 90, -5 100, 50 100 C 105 100, 125 90, 130 70 C 135 50, 120 30, 90 30 C 70 10, 30 10, 10 30 Z" 
+          fill="#F0F9FF" stroke="#38BDF8" stroke-width="4" />
+    <!-- Vertical segments for pumpkin divisions -->
+    <path d="M 50 15 C 25 15, 20 50, 20 100" fill="none" stroke="#BAE6FD" stroke-width="3" />
+    <path d="M 50 15 C 75 15, 80 50, 80 100" fill="none" stroke="#BAE6FD" stroke-width="3" />
+    <path d="M 50 15 L 50 100" fill="none" stroke="#BAE6FD" stroke-width="3" />
+
+    <!-- Crown on top -->
+    <path d="M 40 15 L 45 5 L 50 10 L 55 5 L 60 15 Z" fill="#F59E0B" />
+    <circle cx="50" cy="2" r="3" fill="#F59E0B" />
+
+    <!-- Window -->
+    <circle cx="50" cy="50" r="22" fill="#E0F2FE" stroke="#F59E0B" stroke-width="3" />
+    <path d="M 50 28 L 50 72 M 28 50 L 72 50" stroke="#38BDF8" stroke-width="2" />
+
+    <!-- Swirl decorations -->
+    <path d="M -30 70 C -50 70, -60 50, -40 40 C -30 35, -20 45, -30 55" fill="none" stroke="#F59E0B" stroke-width="3" stroke-linecap="round"/>
+    <path d="M 130 70 C 150 70, 160 50, 140 40 C 130 35, 120 45, 130 55" fill="none" stroke="#F59E0B" stroke-width="3" stroke-linecap="round"/>
+  </g>
+
+  <!-- Cinderella Foreground (Left/Center) -->
+  <g transform="translate(40, 60)">
+    
+    <!-- Magical Back Glow for Cinderella -->
+    <circle cx="160" cy="260" r="160" fill="#7DD3FC" opacity="0.15" filter="blur(20px)" />
+
+    <!-- Dress Back (Sleeves / Collar) -->
+    <!-- Puff Sleeves -->
+    <ellipse cx="90" cy="340" rx="35" ry="30" fill="url(#dressGrad)" transform="rotate(-15, 90, 340)" />
+    <ellipse cx="230" cy="340" rx="35" ry="30" fill="url(#dressGrad)" transform="rotate(15, 230, 340)" />
+    
+    <!-- Dress Bodice -->
+    <path d="M 95 330 Q 160 360 225 330 L 235 460 L 85 460 Z" fill="url(#dressGrad)" />
+    <path d="M 120 340 L 160 410 L 200 340" fill="none" stroke="#FFFFFF" stroke-width="3" opacity="0.7" />
+
+    <!-- Neck -->
+    <path d="M 140 280 L 140 330 L 180 330 L 180 280 Z" fill="url(#skinGrad)" />
+    
+    <!-- Black / Blue Choker -->
+    <path d="M 140 300 Q 160 308 180 300" fill="none" stroke="#1E3A8A" stroke-width="6" stroke-linecap="round" />
+
+    <!-- Head / Face -->
+    <path d="M 115 200 C 115 160, 205 160, 205 200 C 205 250, 195 270, 160 285 C 125 270, 115 250, 115 200 Z" fill="url(#skinGrad)" />
+    
+    <!-- Ears -->
+    <circle cx="112" cy="215" r="10" fill="url(#skinGrad)" />
+    <circle cx="208" cy="215" r="10" fill="url(#skinGrad)" />
+    
+    <!-- Earring (Sparkling crystal/blue) -->
+    <circle cx="112" cy="221" r="5" fill="#E0F2FE" stroke="#38BDF8" stroke-width="1" />
+    <circle cx="208" cy="221" r="5" fill="#E0F2FE" stroke="#38BDF8" stroke-width="1" />
+
+    <!-- Eyes (Cute closed smiling eyes) -->
+    <path d="M 130 215 Q 140 222 148 215" fill="none" stroke="#475569" stroke-width="3.5" stroke-linecap="round" />
+    <path d="M 172 215 Q 180 222 190 215" fill="none" stroke="#475569" stroke-width="3.5" stroke-linecap="round" />
+    
+    <!-- Eyelashes -->
+    <path d="M 127 213 L 123 209 M 149 213 L 153 209" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round" />
+    <path d="M 171 213 L 167 209 M 193 213 L 197 209" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round" />
+
+    <!-- Eyebrows -->
+    <path d="M 127 202 Q 138 196 148 202" fill="none" stroke="#B45309" stroke-width="2" stroke-linecap="round" />
+    <path d="M 172 202 Q 182 196 193 202" fill="none" stroke="#B45309" stroke-width="2" stroke-linecap="round" />
+
+    <!-- Rosy Cheeks -->
+    <circle cx="132" cy="235" r="12" fill="#F43F5E" opacity="0.3" filter="blur(2px)" />
+    <circle cx="188" cy="235" r="12" fill="#F43F5E" opacity="0.3" filter="blur(2px)" />
+
+    <!-- Cute Smiling Mouth -->
+    <path d="M 152 245 Q 160 254 168 245" fill="none" stroke="#E11D48" stroke-width="3" stroke-linecap="round" />
+    
+    <!-- Hair - Bun at the top -->
+    <circle cx="160" cy="115" r="45" fill="url(#hairGrad)" />
+
+    <!-- Headband (Light blue) -->
+    <path d="M 122 155 Q 160 135 198 155" fill="none" stroke="#0EA5E9" stroke-width="12" stroke-linecap="round" />
+    
+    <!-- Hair bangs / front hair sweep -->
+    <path d="M 115 175 C 120 150, 140 145, 160 160 C 180 145, 200 150, 205 175 C 215 200, 205 210, 205 210 C 205 210, 195 190, 185 190 C 175 190, 165 200, 160 195 C 155 200, 145 190, 135 190 C 125 190, 115 210, 115 210 C 115 210, 105 200, 115 175 Z" fill="url(#hairGrad)" />
+
+    <!-- Hair side curls -->
+    <path d="M 115 200 C 105 205, 105 225, 115 230 C 120 232, 122 225, 118 220" fill="url(#hairGrad)" />
+    <path d="M 205 200 C 215 205, 215 225, 205 230 C 200 232, 198 225, 202 220" fill="url(#hairGrad)" />
+
+    <!-- Headband Ribbon Details -->
+    <path d="M 121 150 Q 128 145 125 158" fill="none" stroke="#38BDF8" stroke-width="3" />
+    <path d="M 199 150 Q 192 145 195 158" fill="none" stroke="#38BDF8" stroke-width="3" />
+
+    <!-- Sparkles on Cinderella -->
+    <g fill="#FFFFFF">
+      <!-- Sparkle 1 -->
+      <path d="M 85 310 L 87 318 L 95 320 L 87 322 L 85 330 L 83 322 L 75 320 L 83 318 Z" />
+      <!-- Sparkle 2 -->
+      <path d="M 225 310 L 227 318 L 235 320 L 227 322 L 225 330 L 223 322 L 215 320 L 223 318 Z" />
+      <!-- Sparkle 3 (Hair sparkle) -->
+      <path d="M 180 120 L 181 125 L 186 126 L 181 127 L 180 132 L 179 127 L 174 126 L 179 125 Z" />
+    </g>
+  </g>
+</svg>

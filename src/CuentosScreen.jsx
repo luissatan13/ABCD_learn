@@ -18,7 +18,7 @@ export function CuentosScreen() {
     <div className="screen" style={{ paddingBottom: '80px' }}>
       <div className="scroll-area">
         <div style={{ padding: '24px', maxWidth: '600px', margin: '0 auto' }}>
-          <h1 style={{ fontSize: '28px', color: 'white', textAlign: 'center', marginBottom: '8px' }}>
+          <h1 style={{ fontSize: '28px', color: 'var(--text-bright)', textAlign: 'center', marginBottom: '8px' }}>
             📚 Cuentos
           </h1>
           <p style={{ color: 'var(--text-muted)', textAlign: 'center', marginBottom: '24px', fontSize: '14px' }}>
@@ -53,7 +53,7 @@ export function CuentosScreen() {
                   )}
                 </div>
                 <div style={{ flex: 1 }}>
-                  <h3 style={{ color: 'white', margin: '0 0 4px 0', fontSize: '18px' }}>{story.title}</h3>
+                  <h3 style={{ color: 'var(--text-bright)', margin: '0 0 4px 0', fontSize: '18px' }}>{story.title}</h3>
                   <p style={{ color: 'var(--text-muted)', margin: '0 0 8px 0', fontSize: '13px', lineHeight: '1.4' }}>
                     {story.description}
                   </p>

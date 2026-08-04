@@ -28,13 +28,13 @@ export function StoryReader({ story, onClose }) {
   };
 
   return (
-    <div className="screen" style={{ backgroundColor: '#0D1040', display: 'flex', flexDirection: 'column' }}>
+    <div className="screen" style={{ backgroundColor: 'var(--bg)', display: 'flex', flexDirection: 'column' }}>
       
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px' }}>
         <button 
           onClick={onClose}
-          style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: 'white', padding: '8px 16px', borderRadius: '20px', cursor: 'pointer', fontWeight: 'bold' }}
+          style={{ background: 'var(--bg-glass-strong)', border: 'none', color: 'var(--text-bright)', padding: '8px 16px', borderRadius: '20px', cursor: 'pointer', fontWeight: 'bold' }}
         >
           ❌ Cerrar
         </button>
@@ -68,7 +68,7 @@ export function StoryReader({ story, onClose }) {
 
         {/* Text */}
         <div className="card" style={{ width: '100%', maxWidth: '400px', textAlign: 'center', position: 'relative' }}>
-          <p style={{ fontSize: '22px', lineHeight: '1.5', color: 'white', margin: 0, paddingRight: '40px' }}>
+          <p style={{ fontSize: '22px', lineHeight: '1.5', color: 'var(--text-bright)', margin: 0, paddingRight: '40px' }}>
             {page.text}
           </p>
           
