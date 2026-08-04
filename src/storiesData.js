@@ -68,29 +68,29 @@ export const STORIES = [
     id: 'cenicienta',
     title: 'Cenicienta',
     coverEmoji: '👠',
-    coverImage: 'https://images.unsplash.com/photo-1518063319808-149d5b9d3b45?auto=format&fit=crop&q=80&w=400',
+    coverImage: '/cenicienta.png',
     description: 'Una joven, un hada madrina y un zapatito de cristal.',
     difficulty: 'Fácil',
     pages: [
       {
         id: 1,
         text: 'Cenicienta era una joven muy dulce que trabajaba mucho en su casa.',
-        image: 'https://images.unsplash.com/photo-1518063319808-149d5b9d3b45?auto=format&fit=crop&q=80&w=400',
+        image: '/cenicienta.png',
       },
       {
         id: 2,
         text: 'Con ayuda de su hada madrina, fue a un gran baile en el castillo del príncipe.',
-        image: 'https://images.unsplash.com/photo-1518063319808-149d5b9d3b45?auto=format&fit=crop&q=80&w=400',
+        image: '/cenicienta.png',
       },
       {
         id: 3,
         text: 'Pero tuvo que salir corriendo a la medianoche y perdió un zapatito de cristal.',
-        image: 'https://images.unsplash.com/photo-1518063319808-149d5b9d3b45?auto=format&fit=crop&q=80&w=400',
+        image: '/cenicienta.png',
       },
       {
         id: 4,
         text: 'El príncipe buscó a la dueña por todos lados, la encontró y se casaron.',
-        image: 'https://images.unsplash.com/photo-1518063319808-149d5b9d3b45?auto=format&fit=crop&q=80&w=400',
+        image: '/cenicienta.png',
       }
     ]
   },
