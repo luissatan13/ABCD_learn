@@ -41,7 +41,7 @@ const ALL_GAME_DATA = [
 
   // M
   { word: 'MAMÁ', blank: 0, answer: 'MA', options: ['PE', 'MA', 'SO'], emoji: '👩', hint: 'Tu mamá', target: 'M' },
-  { word: 'MESA', blank: 0, answer: 'ME', options: ['SO', 'ME', 'PA'], emoji: '🪑', hint: 'Mueble', target: 'M' },
+  { word: 'MESA', blank: 0, answer: 'ME', options: ['SO', 'ME', 'PA'], emoji: '🍽️', hint: 'Mueble', target: 'M' },
   { word: 'MIEL', blank: 0, answer: 'MI', options: ['PI', 'MI', 'LI'], emoji: '🍯', hint: 'Dulce de abeja', target: 'M' },
   { word: 'MONO', blank: 0, answer: 'MO', options: ['PO', 'MO', 'SO'], emoji: '🐒', hint: 'Come plátanos', target: 'M' },
   { word: 'MULA', blank: 0, answer: 'MU', options: ['LU', 'PU', 'MU'], emoji: '🐴', hint: 'Animal de carga', target: 'M' },

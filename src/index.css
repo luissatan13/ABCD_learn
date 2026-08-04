@@ -2541,3 +2541,9 @@ button[id^="alphabet-"]:active { transform: scale(0.92) !important; }
 @media (min-width: 391px) {
   body { background: #06061A; }
 }
+
+
+/* Name Input Fix */
+.name-input {
+  text-align: center;
+}

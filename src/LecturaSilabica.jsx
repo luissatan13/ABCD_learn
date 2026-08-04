@@ -5,7 +5,7 @@ import { useApp } from './AppContext';
 // Words dataset decomposed into syllables
 const WORDS_BY_SYLLABLES = [
   { id: 'mama', word: 'MAMÁ', syllables: ['MA', 'MÁ'], emoji: '👩', category: 'Fácil' },
-  { id: 'mesa', word: 'MESA', syllables: ['ME', 'SA'], emoji: '🪑', category: 'Fácil' },
+  { id: 'mesa', word: 'MESA', syllables: ['ME', 'SA'], emoji: '🍽️', category: 'Fácil' },
   { id: 'mono', word: 'MONO', syllables: ['MO', 'NO'], emoji: '🐒', category: 'Fácil' },
   { id: 'sapo', word: 'SAPO', syllables: ['SA', 'PO'], emoji: '🐸', category: 'Fácil' },
   { id: 'luna', word: 'LUNA', syllables: ['LU', 'NA'], emoji: '🌙', category: 'Fácil' },

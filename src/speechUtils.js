@@ -76,6 +76,16 @@ function pickVoice(type, exactVoiceName) {
   return voices[0] || null;
 }
 
+const PHONETIC_MAP = {
+  'BI': 'vi',
+  'bi': 'vi',
+  'JUGO': 'hugo',
+  'jugo': 'hugo',
+  'Jugo': 'Hugo',
+  'B': 've',
+  'V': 've',
+};
+
 /**
  * Main speak function.
  * @param {string} text
@@ -89,7 +99,17 @@ export function speakText(text, voiceType = 'male', slow = false, exactVoiceName
 
   window.speechSynthesis.cancel();
 
-  const utt = new SpeechSynthesisUtterance(text);
+  // Apply phonetic replacements
+  let spokenText = text;
+  const uppercaseText = text.toUpperCase();
+  if (PHONETIC_MAP[uppercaseText]) {
+    spokenText = PHONETIC_MAP[uppercaseText];
+  } else {
+    // Basic word replacement for longer sentences (if needed in future)
+    // currently just exact matches
+  }
+
+  const utt = new SpeechSynthesisUtterance(spokenText);
   utt.lang = 'es-MX'; // prefer Mexican Spanish for Latin American users
 
   // Rate: slow mode = 0.5, otherwise based on speedMult slider

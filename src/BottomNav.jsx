@@ -34,10 +34,18 @@ const TrophyIcon = ({ active }) => (
   </svg>
 );
 
+const BookIcon = ({ active }) => (
+  <svg className="nav-svg" viewBox="0 0 24 24" fill="none">
+    <path d="M4 19.5v-15A2.5 2.5 0 016.5 2H20v15H6.5a2.5 2.5 0 000 5H20" stroke={active ? 'white' : '#64748B'} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M6.5 2L6.5 22" stroke={active ? 'white' : '#64748B'} strokeWidth="1.8"/>
+  </svg>
+);
+
 const NAV_ITEMS = [
   { id: 'mapa',    label: 'Mapa',    Icon: MapIcon    },
   { id: 'juegos',  label: 'Juegos',  Icon: GameIcon   },
   { id: 'letras',  label: 'Letras',  Icon: LetrasIcon },
+  { id: 'cuentos', label: 'Cuentos', Icon: BookIcon   },
   { id: 'premios', label: 'Premios', Icon: TrophyIcon },
 ];
 

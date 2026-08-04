@@ -6,6 +6,7 @@ import { MapScreen } from './MapScreen';
 import { GameScreen } from './GameScreen';
 import { LetrasScreen } from './LetrasScreen';
 import { PremiosScreen } from './PremiosScreen';
+import { CuentosScreen } from './CuentosScreen';
 import { Header } from './Header';
 import { BottomNav } from './BottomNav';
 import { SettingsModal } from './SettingsModal';
@@ -56,6 +57,8 @@ function App() {
         );
       case 'letras':
         return <LetrasScreen />;
+      case 'cuentos':
+        return <CuentosScreen />;
       case 'premios':
         return <PremiosScreen onGoToMap={() => setActiveTab('mapa')} />;
       default:
