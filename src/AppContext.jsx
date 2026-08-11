@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { speakText } from './speechUtils';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { db } from './firebase';
 
 const AppContext = createContext(null);
 
@@ -53,8 +55,14 @@ const INITIAL_MEDALS = [
 
 export function AppProvider({ children }) {
   const [user, setUser] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('adl_user')) || null; }
-    catch { return null; }
+    try {
+      const savedUser = JSON.parse(localStorage.getItem('adl_user'));
+      if (savedUser && savedUser.sub !== 'guest-123') return savedUser;
+      localStorage.removeItem('adl_user');
+      return null;
+    } catch {
+      return null;
+    }
   });
 
   const [profile, setProfile] = useState(() => {
@@ -200,6 +208,67 @@ export function AppProvider({ children }) {
   useEffect(() => {
     localStorage.setItem('adl_mistakes', JSON.stringify(mistakes));
   }, [mistakes]);
+
+  // ---- FIRESTORE CLOUD PROGRESS SYNC ----
+  // 1. Fetch user progress from cloud on login/load
+  useEffect(() => {
+    if (!user || !user.sub || user.sub === 'guest-123') return;
+
+    const loadCloudProgress = async () => {
+      try {
+        const userRef = doc(db, 'users', user.sub);
+        const docSnap = await getDoc(userRef);
+        if (docSnap.exists()) {
+          const cloud = docSnap.data();
+          if (cloud.profile) setProfile(cloud.profile);
+          if (cloud.levels && Array.isArray(cloud.levels)) setLevels(cloud.levels);
+          if (cloud.medals && Array.isArray(cloud.medals)) setMedals(cloud.medals);
+          if (typeof cloud.xp === 'number') setXp(cloud.xp);
+          if (cloud.mistakes) setMistakes(cloud.mistakes);
+        } else {
+          // Initialize user progress in Firestore
+          await setDoc(userRef, {
+            user,
+            profile: profile || null,
+            levels,
+            medals,
+            xp,
+            mistakes,
+            updatedAt: new Date().toISOString(),
+          });
+        }
+      } catch (err) {
+        console.warn('Sync cloud info:', err);
+      }
+    };
+
+    loadCloudProgress();
+  }, [user?.sub]);
+
+  // 2. Auto-save changes to Firestore when progress updates
+  useEffect(() => {
+    if (!user || !user.sub || user.sub === 'guest-123') return;
+
+    const saveCloudProgress = async () => {
+      try {
+        const userRef = doc(db, 'users', user.sub);
+        await setDoc(userRef, {
+          user,
+          profile,
+          levels,
+          medals,
+          xp,
+          mistakes,
+          updatedAt: new Date().toISOString(),
+        }, { merge: true });
+      } catch (err) {
+        console.warn('Sync save cloud error:', err);
+      }
+    };
+
+    const timer = setTimeout(saveCloudProgress, 800);
+    return () => clearTimeout(timer);
+  }, [user, profile, levels, medals, xp, mistakes]);
 
   const login = (googleUser) => { setUser(googleUser); };
   const logout = () => { setUser(null); setProfile(null); };
