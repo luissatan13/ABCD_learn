@@ -14,7 +14,8 @@ export default defineConfig({
         skipWaiting: true,
         clientsClaim: true,
         cleanupOutdatedCaches: true,
-        globPatterns: ['**/*.{js,css,html,ico,png,jpg,jpeg,svg}'],
+        navigateFallbackDenylist: [/^\/ads\.txt$/],
+        globPatterns: ['**/*.{js,css,html,ico,png,jpg,jpeg,svg,txt}'],
       },
       manifest: {
         name: 'Aventura de Leer',

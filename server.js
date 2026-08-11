@@ -8,6 +8,12 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 8080;
 
+// Explicit route for ads.txt
+app.get('/ads.txt', (req, res) => {
+  res.type('text/plain');
+  res.sendFile(path.join(__dirname, 'dist', 'ads.txt'));
+});
+
 // Serve static files from dist/
 app.use(express.static(path.join(__dirname, 'dist')));
 
