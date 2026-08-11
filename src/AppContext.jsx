@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { speakText } from './speechUtils';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from './firebase';
+import { isVipEmail } from './vipEmails';
 
 const AppContext = createContext(null);
 
@@ -134,6 +135,26 @@ export function AppProvider({ children }) {
     catch { return 'both'; }
   });
 
+  // Subscription & Premium Access State
+  const [isSubscribed, setIsSubscribed] = useState(() => {
+    try { return localStorage.getItem('adl_is_subscribed') === 'true'; }
+    catch { return false; }
+  });
+  const [showPaywall, setShowPaywall] = useState(false);
+
+  // User is premium if email is in VIP_EMAILS or has active subscription
+  const isPremium = isVipEmail(user?.email) || isSubscribed;
+
+  const activatePremium = useCallback(() => {
+    setIsSubscribed(true);
+    localStorage.setItem('adl_is_subscribed', 'true');
+  }, []);
+
+  const resetPremium = useCallback(() => {
+    setIsSubscribed(false);
+    localStorage.removeItem('adl_is_subscribed');
+  }, []);
+
   const [currentLevel, setCurrentLevel] = useState(1);
 
   // Persist voice and letter case settings
@@ -145,6 +166,7 @@ export function AppProvider({ children }) {
   useEffect(() => { localStorage.setItem('adl_read_speed', readSpeed.toString()); }, [readSpeed]);
   useEffect(() => { localStorage.setItem('adl_theme', theme); }, [theme]);
   useEffect(() => { localStorage.setItem('adl_letter_case', letterCase); }, [letterCase]);
+  useEffect(() => { localStorage.setItem('adl_is_subscribed', isSubscribed.toString()); }, [isSubscribed]);
 
   const toggleLetterCase = useCallback(() => {
     setLetterCase(prev => {
@@ -316,6 +338,7 @@ export function AppProvider({ children }) {
       theme, setTheme,
       letterCase, setLetterCase,
       toggleLetterCase, formatText,
+      isPremium, showPaywall, setShowPaywall, activatePremium, resetPremium,
     }}>
       {children}
     </AppContext.Provider>

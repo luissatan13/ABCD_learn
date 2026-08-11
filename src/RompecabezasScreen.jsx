@@ -31,9 +31,17 @@ function StarRain() {
 }
 
 export function RompecabezasScreen({ onBack }) {
-  const { speak, setXp } = useApp();
+  const { speak, setXp, isPremium, setShowPaywall } = useApp();
   const [selectedPuzzleIndex, setSelectedPuzzleIndex] = useState(0);
   const [gridSize, setGridSize] = useState(2); // 2=2x2 (4pzs), 3=3x3 (9pzs), 4=4x4 (16pzs), 5=5x5 (25pzs)
+
+  const handleSelectGridSize = (size) => {
+    if (size >= 4 && !isPremium) {
+      setShowPaywall(true);
+      return;
+    }
+    setGridSize(size);
+  };
 
   const activePuzzle = PUZZLES[selectedPuzzleIndex] || PUZZLES[0];
   const totalPieces = gridSize * gridSize;
@@ -210,27 +218,27 @@ export function RompecabezasScreen({ onBack }) {
             <div className="difficulty-pills" style={{ overflowX: 'auto', paddingBottom: 4 }}>
               <button
                 className={`diff-pill ${gridSize === 2 ? 'active' : ''}`}
-                onClick={() => setGridSize(2)}
+                onClick={() => handleSelectGridSize(2)}
               >
                 🌟 Fácil (4 pzs)
               </button>
               <button
                 className={`diff-pill ${gridSize === 3 ? 'active' : ''}`}
-                onClick={() => setGridSize(3)}
+                onClick={() => handleSelectGridSize(3)}
               >
                 ⚡ Normal (9 pzs)
               </button>
               <button
                 className={`diff-pill ${gridSize === 4 ? 'active' : ''}`}
-                onClick={() => setGridSize(4)}
+                onClick={() => handleSelectGridSize(4)}
               >
-                🔥 Difícil (16 pzs)
+                {isPremium ? '🔥 Difícil (16 pzs)' : '👑 Difícil (16 pzs)'}
               </button>
               <button
                 className={`diff-pill ${gridSize === 5 ? 'active' : ''}`}
-                onClick={() => setGridSize(5)}
+                onClick={() => handleSelectGridSize(5)}
               >
-                🏆 Experto (25 pzs)
+                {isPremium ? '🏆 Experto (25 pzs)' : '👑 Experto (25 pzs)'}
               </button>
             </div>
 
@@ -258,107 +266,109 @@ export function RompecabezasScreen({ onBack }) {
             </div>
           )}
 
-          {/* Main Board Grid */}
-          <div className="puzzle-board-container">
-            <div
-              className={`puzzle-board grid-${gridSize} ${isCompleted ? 'completed' : ''}`}
-              style={{
-                gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
-                gridTemplateRows: `repeat(${gridSize}, 1fr)`,
-              }}
-            >
-              {board.map((pieceId, slotIdx) => {
-                const isSelected = selectedPiece?.source === 'board' && selectedPiece.index === slotIdx;
-                const isCorrect = pieceId === slotIdx;
+          {/* Main Board Grid & Tray Wrapper */}
+          <div className="puzzle-main-wrapper">
+            <div className="puzzle-board-container">
+              <div
+                className={`puzzle-board grid-${gridSize} ${isCompleted ? 'completed' : ''}`}
+                style={{
+                  gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
+                  gridTemplateRows: `repeat(${gridSize}, 1fr)`,
+                }}
+              >
+                {board.map((pieceId, slotIdx) => {
+                  const isSelected = selectedPiece?.source === 'board' && selectedPiece.index === slotIdx;
+                  const isCorrect = pieceId === slotIdx;
 
-                return (
-                  <div
-                    key={slotIdx}
-                    className={`puzzle-slot ${pieceId !== null ? 'filled' : 'empty'} ${isSelected ? 'selected' : ''} ${isCorrect ? 'correct' : ''}`}
-                    onClick={() => handleSlotClick(slotIdx)}
-                    onDoubleClick={() => handleReturnToTray(slotIdx)}
-                    style={pieceId !== null ? getTileStyle(pieceId, 280) : {}}
-                  >
-                    {pieceId === null && (
-                      <span className="slot-number-guide" style={{ fontSize: gridSize >= 4 ? 11 : 14 }}>
-                        {slotIdx + 1}
-                      </span>
+                  return (
+                    <div
+                      key={slotIdx}
+                      className={`puzzle-slot ${pieceId !== null ? 'filled' : 'empty'} ${isSelected ? 'selected' : ''} ${isCorrect ? 'correct' : ''}`}
+                      onClick={() => handleSlotClick(slotIdx)}
+                      onDoubleClick={() => handleReturnToTray(slotIdx)}
+                      style={pieceId !== null ? getTileStyle(pieceId, 280) : {}}
+                    >
+                      {pieceId === null && (
+                        <span className="slot-number-guide" style={{ fontSize: gridSize >= 4 ? 11 : 14 }}>
+                          {slotIdx + 1}
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Celebration Overlay Card when completed */}
+            {isCompleted ? (
+              <div className="celebration-overlay" role="dialog" aria-label="¡Rompecabezas completado!">
+                <div className="celebration-card" style={{ maxWidth: 320 }}>
+                  <div className="celebration-emoji">🎉🔥</div>
+                  <h2 className="celebration-title">¡Increíble!</h2>
+                  <p className="celebration-desc">
+                    ¡Armaste el rompecabezas de <strong>{activePuzzle.title}</strong> en modo {gridSize === 2 ? 'Fácil' : gridSize === 3 ? 'Normal' : gridSize === 4 ? 'Difícil 🔥' : 'Experto 🏆'}!<br />
+                    <span style={{ color: 'var(--gold-light)', fontWeight: 800, fontSize: 18, marginTop: 8, display: 'block' }}>
+                      + {getXpForGrid(gridSize)} XP ⭐
+                    </span>
+                  </p>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%' }}>
+                    <button className="btn-primary" onClick={handleNextPuzzle}>
+                      ➡️ Siguiente Rompecabezas
+                    </button>
+                    <button className="btn-secondary" onClick={startPuzzle}>
+                      🔄 Armar de Nuevo
+                    </button>
+                    {onBack && (
+                      <button className="btn-secondary" onClick={onBack}>
+                        ⬅️ Volver a Juegos
+                      </button>
                     )}
                   </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Celebration Overlay Card when completed */}
-          {isCompleted ? (
-            <div className="celebration-overlay" role="dialog" aria-label="¡Rompecabezas completado!">
-              <div className="celebration-card" style={{ maxWidth: 320 }}>
-                <div className="celebration-emoji">🎉🔥</div>
-                <h2 className="celebration-title">¡Increíble!</h2>
-                <p className="celebration-desc">
-                  ¡Armaste el rompecabezas de <strong>{activePuzzle.title}</strong> en modo {gridSize === 2 ? 'Fácil' : gridSize === 3 ? 'Normal' : gridSize === 4 ? 'Difícil 🔥' : 'Experto 🏆'}!<br />
-                  <span style={{ color: 'var(--gold-light)', fontWeight: 800, fontSize: 18, marginTop: 8, display: 'block' }}>
-                    + {getXpForGrid(gridSize)} XP ⭐
-                  </span>
-                </p>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%' }}>
-                  <button className="btn-primary" onClick={handleNextPuzzle}>
-                    ➡️ Siguiente Rompecabezas
-                  </button>
-                  <button className="btn-secondary" onClick={startPuzzle}>
-                    🔄 Armar de Nuevo
-                  </button>
-                  {onBack && (
-                    <button className="btn-secondary" onClick={onBack}>
-                      ⬅️ Volver a Juegos
-                    </button>
-                  )}
                 </div>
               </div>
-            </div>
-          ) : (
-            /* Piece Tray / Carousel */
-            <div className="puzzle-tray-section">
-              <p className="tray-instruction">
-                👇 Toca una pieza de abajo y luego toca la casilla del tablero:
-              </p>
+            ) : (
+              /* Piece Tray / Carousel */
+              <div className="puzzle-tray-section">
+                <p className="tray-instruction">
+                  👇 Toca una pieza de abajo y luego toca la casilla del tablero:
+                </p>
 
-              <div className="puzzle-tray-grid">
-                {tray.length === 0 ? (
-                  <div className="tray-empty">¡Todas las piezas están en el tablero!</div>
-                ) : (
-                  tray.map(pieceId => {
-                    const isSelected = selectedPiece?.source === 'tray' && selectedPiece.pieceId === pieceId;
-                    const itemSize = gridSize >= 4 ? 52 : 70;
-                    const tileSize = 280 / gridSize;
-                    const scale = itemSize / tileSize;
+                <div className="puzzle-tray-grid">
+                  {tray.length === 0 ? (
+                    <div className="tray-empty">¡Todas las piezas están en el tablero!</div>
+                  ) : (
+                    tray.map(pieceId => {
+                      const isSelected = selectedPiece?.source === 'tray' && selectedPiece.pieceId === pieceId;
+                      const itemSize = gridSize >= 4 ? 52 : 70;
+                      const tileSize = 280 / gridSize;
+                      const scale = itemSize / tileSize;
 
-                    return (
-                      <button
-                        key={pieceId}
-                        className={`tray-piece-btn ${isSelected ? 'selected' : ''}`}
-                        onClick={() => handleSelectTrayPiece(pieceId)}
-                        style={{
-                          width: itemSize,
-                          height: itemSize,
-                          backgroundImage: `url(${activePuzzle.src})`,
-                          backgroundSize: `${280 * scale}px ${280 * scale}px`,
-                          backgroundPosition: `${-(pieceId % gridSize) * tileSize * scale}px ${-Math.floor(pieceId / gridSize) * tileSize * scale}px`,
-                        }}
-                        aria-label={`Pieza ${pieceId + 1}`}
-                      />
-                    );
-                  })
-                )}
+                      return (
+                        <button
+                          key={pieceId}
+                          className={`tray-piece-btn ${isSelected ? 'selected' : ''}`}
+                          onClick={() => handleSelectTrayPiece(pieceId)}
+                          style={{
+                            width: itemSize,
+                            height: itemSize,
+                            backgroundImage: `url(${activePuzzle.src})`,
+                            backgroundSize: `${280 * scale}px ${280 * scale}px`,
+                            backgroundPosition: `${-(pieceId % gridSize) * tileSize * scale}px ${-Math.floor(pieceId / gridSize) * tileSize * scale}px`,
+                          }}
+                          aria-label={`Pieza ${pieceId + 1}`}
+                        />
+                      );
+                    })
+                  )}
+                </div>
+
+                <button className="btn-secondary" onClick={startPuzzle} style={{ marginTop: 12 }}>
+                  🔄 Reiniciar Piezas
+                </button>
               </div>
-
-              <button className="btn-secondary" onClick={startPuzzle} style={{ marginTop: 12 }}>
-                🔄 Reiniciar Piezas
-              </button>
-            </div>
-          )}
+            )}
+          </div>
 
         </div>
       </div>

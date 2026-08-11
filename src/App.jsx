@@ -10,12 +10,31 @@ import { CuentosScreen } from './CuentosScreen';
 import { Header } from './Header';
 import { BottomNav } from './BottomNav';
 import { SettingsModal } from './SettingsModal';
+import { PaywallModal } from './PaywallModal';
 
 function App() {
-  const { user, profile, theme } = useApp();
+  const { user, profile, theme, showPaywall, setShowPaywall, activatePremium } = useApp();
   const [activeTab, setActiveTab] = useState('mapa');
   const [showSettings, setShowSettings] = useState(false);
   const [currentGame, setCurrentGame] = useState(null); // level object
+
+  // Handle Mercado Pago return redirect
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const paymentStatus = params.get('payment');
+      const collectionStatus = params.get('collection_status') || params.get('status');
+
+      if (paymentStatus === 'success' || collectionStatus === 'approved') {
+        activatePremium();
+        alert('🎉 ¡Pago completado con éxito! Se ha activado tu suscripción PREMIUM ⭐.');
+        window.history.replaceState({}, document.title, window.location.pathname);
+      } else if (paymentStatus === 'failure') {
+        alert('❌ No se pudo completar el pago en Mercado Pago. Puedes intentarlo de nuevo.');
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }
+  }, [activatePremium]);
 
   useEffect(() => {
     const root = document.getElementById('root');
@@ -81,6 +100,7 @@ function App() {
       {renderContent()}
       <BottomNav active={activeTab} onNavigate={setActiveTab} />
       {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
+      {showPaywall && <PaywallModal onClose={() => setShowPaywall(false)} />}
     </>
   );
 }

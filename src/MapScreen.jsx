@@ -1,13 +1,23 @@
 import React, { useEffect, useRef } from 'react';
 import { useApp } from './AppContext';
+import { AdBanner } from './AdBanner';
 
 export function MapScreen({ onPlayLevel }) {
-  const { levels } = useApp();
+  const { levels, isPremium, setShowPaywall } = useApp();
   const currentLevel = levels.find(l => l.status === 'current');
   const lastCompleted = [...levels].reverse().find(l => l.status === 'completed');
   const targetLevelId = currentLevel ? currentLevel.id : (lastCompleted ? lastCompleted.id : levels[0]?.id);
 
   const targetNodeRef = useRef(null);
+
+  const handleLevelClick = (level) => {
+    if (level.status === 'locked') return;
+    if (level.id >= 7 && !isPremium) {
+      setShowPaywall(true);
+      return;
+    }
+    onPlayLevel(level);
+  };
 
   useEffect(() => {
     // Función para centrar el nivel en la pantalla
@@ -35,6 +45,8 @@ export function MapScreen({ onPlayLevel }) {
           {/* Render levels in reverse (top = locked, bottom = done) */}
           {[...levels].reverse().map((level, index, arr) => {
             const isTarget = level.id === targetLevelId;
+            const isPremiumLocked = level.id >= 7 && !isPremium;
+
             return (
               <React.Fragment key={level.id}>
                 {/* Level node */}
@@ -43,15 +55,16 @@ export function MapScreen({ onPlayLevel }) {
                   ref={isTarget ? targetNodeRef : null}
                 >
                   <div
-                    className={`level-circle ${level.status}`}
+                    className={`level-circle ${level.status} ${isPremiumLocked ? 'premium-locked' : ''}`}
                     id={`level-node-${level.id}`}
-                    onClick={() => level.status !== 'locked' && onPlayLevel(level)}
+                    onClick={() => handleLevelClick(level)}
                     role={level.status !== 'locked' ? 'button' : undefined}
-                    aria-label={`Nivel ${level.id}: ${level.label} - ${level.status === 'locked' ? 'Bloqueado' : level.status === 'completed' ? 'Completado' : 'Jugar ahora'}`}
+                    aria-label={`Nivel ${level.id}: ${level.label}`}
                   >
-                    {level.status === 'locked' && <span className="level-lock-icon">🔒</span>}
+                    {isPremiumLocked && <span className="level-lock-icon" style={{ color: '#FCD34D' }}>👑</span>}
+                    {!isPremiumLocked && level.status === 'locked' && <span className="level-lock-icon">🔒</span>}
                     {level.status === 'completed' && <span className="level-check-icon">✓</span>}
-                    {level.status === 'current' && (
+                    {!isPremiumLocked && level.status === 'current' && (
                       <>
                         <span className="level-play-icon">▶</span>
                         <div className="level-stars-decoration">
@@ -63,7 +76,7 @@ export function MapScreen({ onPlayLevel }) {
                   </div>
 
                   <span className="level-label">
-                    {level.status === 'locked' ? `Nivel ${level.id}: ${level.label}` : level.label}
+                    {isPremiumLocked ? `👑 ${level.label}` : level.status === 'locked' ? `Nivel ${level.id}: ${level.label}` : level.label}
                   </span>
 
                   {level.status === 'completed' && (
@@ -80,10 +93,10 @@ export function MapScreen({ onPlayLevel }) {
                   <button
                     id="map-play-btn"
                     className="map-play-btn"
-                    onClick={() => onPlayLevel(level)}
+                    onClick={() => handleLevelClick(level)}
                     aria-label={`Jugar nivel ${level.label}`}
                   >
-                    ¡Jugar Ahora!
+                    {isPremiumLocked ? '👑 Desbloquear Premium' : '¡Jugar Ahora!'}
                   </button>
                 )}
 
@@ -100,6 +113,9 @@ export function MapScreen({ onPlayLevel }) {
           <div className="map-treehouse" aria-label="Casa del árbol - inicio de la aventura">
             <img src="/treehouse_map.png" alt="Casa del árbol" />
           </div>
+
+          {/* Ad Banner for non-premium users */}
+          <AdBanner />
         </div>
       </div>
     </div>

@@ -19,6 +19,7 @@ export function SettingsModal({ onClose }) {
     speak,
     theme, setTheme,
     letterCase, setLetterCase,
+    isPremium, setShowPaywall, resetPremium,
   } = useApp();
 
   const [voices, setVoices] = useState([]);
@@ -273,6 +274,41 @@ export function SettingsModal({ onClose }) {
             <span className="settings-row-label">🌐 Idioma</span>
             <span className="settings-row-value">Español</span>
           </div>
+        </div>
+
+        {/* Membership & Paywall Testing */}
+        <div className="settings-section">
+          <div className="settings-section-title">Membresía & Pagos</div>
+          <div className="settings-row">
+            <span className="settings-row-label">👑 Estado de Cuenta</span>
+            <span className="settings-row-value" style={{ color: isPremium ? '#F5C800' : 'var(--text-muted)', fontWeight: 800 }}>
+              {isPremium ? '⭐ PREMIUM' : '🆓 GRATUITO'}
+            </span>
+          </div>
+
+          <button
+            className="btn-primary"
+            onClick={() => {
+              onClose();
+              setShowPaywall(true);
+            }}
+            style={{ width: '100%', marginTop: 8, fontSize: 13, padding: 10, background: 'linear-gradient(135deg, #F59E0B, #EC4899)' }}
+          >
+            💳 Abrir Pantalla de Suscripción (Mercado Pago)
+          </button>
+
+          {isPremium && (
+            <button
+              className="btn-secondary"
+              onClick={() => {
+                resetPremium();
+                alert('Modo Gratuito activado. Ahora verás los candados en niveles y rompecabezas.');
+              }}
+              style={{ width: '100%', marginTop: 6, fontSize: 12, padding: 8 }}
+            >
+              🔄 Volver a Modo Gratuito (Para probar candados)
+            </button>
+          )}
         </div>
 
         <button
