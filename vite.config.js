@@ -8,13 +8,20 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      injectRegister: 'auto',
       devOptions: { enabled: true },
+      workbox: {
+        skipWaiting: true,
+        clientsClaim: true,
+        cleanupOutdatedCaches: true,
+        globPatterns: ['**/*.{js,css,html,ico,png,jpg,jpeg,svg}'],
+      },
       manifest: {
         name: 'Aventura de Leer',
         short_name: 'Aventura',
         description: 'Aprende a leer jugando con vocales y sílabas.',
-        theme_color: '#F2ECD8',
-        background_color: '#F2ECD8',
+        theme_color: '#0F1035',
+        background_color: '#0F1035',
         display: 'standalone',
         icons: [
           {
