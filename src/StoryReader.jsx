@@ -3,7 +3,7 @@ import { useApp } from './AppContext';
 
 export function StoryReader({ story, onClose }) {
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
-  const { speak } = useApp();
+  const { speak, formatText } = useApp();
 
   const page = story.pages[currentPageIndex];
   const isLastPage = currentPageIndex === story.pages.length - 1;
@@ -69,7 +69,7 @@ export function StoryReader({ story, onClose }) {
         {/* Text */}
         <div className="card" style={{ width: '100%', maxWidth: '400px', textAlign: 'center', position: 'relative' }}>
           <p style={{ fontSize: '22px', lineHeight: '1.5', color: 'var(--text-bright)', margin: 0, paddingRight: '40px' }}>
-            {page.text}
+            {formatText(page.text, 'sentence')}
           </p>
           
           {/* Read Button */}

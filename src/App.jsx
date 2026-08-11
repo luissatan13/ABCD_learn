@@ -3,7 +3,7 @@ import { useApp } from './AppContext';
 import { LoginScreen } from './LoginScreen';
 import { ProfileScreen } from './ProfileScreen';
 import { MapScreen } from './MapScreen';
-import { GameScreen } from './GameScreen';
+import { JuegosHub } from './JuegosHub';
 import { LetrasScreen } from './LetrasScreen';
 import { PremiosScreen } from './PremiosScreen';
 import { CuentosScreen } from './CuentosScreen';
@@ -63,12 +63,7 @@ function App() {
       case 'mapa':
         return <MapScreen onPlayLevel={setCurrentGame} />;
       case 'juegos':
-        return (
-          <GameScreen
-            level={{ id: 99, label: 'Práctica Libre', type: 'silaba', target: 'MA', status: 'current' }}
-            onComplete={() => setActiveTab('mapa')}
-          />
-        );
+        return <JuegosHub />;
       case 'letras':
         return <LetrasScreen />;
       case 'cuentos':

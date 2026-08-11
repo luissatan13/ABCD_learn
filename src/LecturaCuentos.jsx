@@ -43,7 +43,7 @@ const CUENTOS = [
 ];
 
 export function LecturaCuentos() {
-  const { speak } = useApp();
+  const { speak, formatText } = useApp();
   const [contentType, setContentType] = useState('oraciones'); // 'oraciones' | 'cuentos'
   const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -179,7 +179,7 @@ export function LecturaCuentos() {
               className={`word-interactive ${activeWordIndex === idx ? 'highlighted' : ''}`}
               onClick={() => handleWordClick(word, idx)}
             >
-              {word}
+              {formatText(word, 'word')}
             </button>
           ))}
         </div>

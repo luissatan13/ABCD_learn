@@ -18,6 +18,7 @@ export function SettingsModal({ onClose }) {
     readSpeed, setReadSpeed,
     speak,
     theme, setTheme,
+    letterCase, setLetterCase,
   } = useApp();
 
   const [voices, setVoices] = useState([]);
@@ -206,6 +207,37 @@ export function SettingsModal({ onClose }) {
               />
               <span className="speed-label" style={{ fontSize: 18 }}>⚡</span>
             </div>
+          </div>
+        </div>
+
+        {/* Letter Case Selector */}
+        <div className="settings-section">
+          <div className="settings-section-title">🔤 Tipo de Letras</div>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button
+              className={`voice-type-pill ${letterCase === 'both' ? 'active' : ''}`}
+              onClick={() => setLetterCase('both')}
+              style={{ flex: 1, padding: '10px 4px', fontSize: '12px' }}
+              id="letter-case-both"
+            >
+              🔤 Ambas (Aa)
+            </button>
+            <button
+              className={`voice-type-pill ${letterCase === 'lowercase' ? 'active' : ''}`}
+              onClick={() => setLetterCase('lowercase')}
+              style={{ flex: 1, padding: '10px 4px', fontSize: '12px' }}
+              id="letter-case-lowercase"
+            >
+              🔡 Minúsculas
+            </button>
+            <button
+              className={`voice-type-pill ${letterCase === 'uppercase' ? 'active' : ''}`}
+              onClick={() => setLetterCase('uppercase')}
+              style={{ flex: 1, padding: '10px 4px', fontSize: '12px' }}
+              id="letter-case-uppercase"
+            >
+              🔠 Mayúsculas
+            </button>
           </div>
         </div>
 

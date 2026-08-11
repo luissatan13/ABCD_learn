@@ -22,7 +22,7 @@ const getSilabasForConsonante = (consonant) => {
 };
 
 export function LetrasScreen() {
-  const { speak } = useApp();
+  const { speak, formatText } = useApp();
   const [activeTab, setActiveTab] = useState('cuentos'); // 'cuentos' | 'lectura' | 'vocales' | 'alfabeto'
   const [selectedVocal, setSelectedVocal] = useState(null);
   const [activeConsonant, setActiveConsonant] = useState('M');
@@ -126,7 +126,7 @@ export function LetrasScreen() {
                         transition: 'transform 0.2s',
                       }}
                     >
-                      {v.letter}
+                      {formatText(v.letter, 'letter')}
                       <span className="vocal-emoji">{v.emoji}</span>
                     </button>
                   ))}
@@ -152,11 +152,11 @@ export function LetrasScreen() {
                           : '#A29BFE'
                       }}
                     >
-                      {selectedVocal.letter}
+                      {formatText(selectedVocal.letter, 'letter')}
                     </span>
                     <div className="vocal-example">
                       <span style={{ fontSize: 32 }}>{selectedVocal.emoji}</span>
-                      <span>{selectedVocal.word}</span>
+                      <span>{formatText(selectedVocal.word, 'word')}</span>
                     </div>
                     <p className="vocal-sound-hint">🔊 Toca para escuchar</p>
                   </div>
@@ -189,7 +189,7 @@ export function LetrasScreen() {
                       aria-label={`Consonante ${c}`}
                       aria-pressed={activeConsonant === c}
                     >
-                      {c}
+                      {formatText(c, 'letter')}
                     </button>
                   ))}
                 </div>
@@ -204,7 +204,7 @@ export function LetrasScreen() {
                       onClick={() => handleSilabaClick(silaba)}
                       aria-label={`Sílaba ${silaba}`}
                     >
-                      {silaba}
+                      {formatText(silaba, 'syllable')}
                     </button>
                   ))}
                 </div>
@@ -238,7 +238,7 @@ export function LetrasScreen() {
                     }}
                     aria-label={`Letra ${letter}`}
                   >
-                    {letter}
+                    {formatText(letter, 'letter')}
                   </button>
                 ))}
               </div>

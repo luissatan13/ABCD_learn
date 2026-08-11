@@ -9,10 +9,17 @@ const GearIcon = () => (
 );
 
 export function Header({ onSettingsClick, profile }) {
-  const { getXpPercent, getPlayerLevel } = useApp();
+  const { getXpPercent, getPlayerLevel, letterCase, toggleLetterCase } = useApp();
   const avatarSrc = profile?.avatar?.src || '/owl_mascot.png';
   const xpPct = getXpPercent();
   const playerLevel = getPlayerLevel();
+
+  const letterCaseLabel = letterCase === 'both' ? 'Aa' : letterCase === 'lowercase' ? 'a' : 'A';
+  const letterCaseTitle = letterCase === 'both' 
+    ? 'Modo: Mayúsculas y minúsculas (Aa)' 
+    : letterCase === 'lowercase' 
+    ? 'Modo: Solo minúsculas (a)' 
+    : 'Modo: Solo mayúsculas (A)';
 
   return (
     <header className="app-header">
@@ -31,14 +38,25 @@ export function Header({ onSettingsClick, profile }) {
           </div>
         </div>
       </div>
-      <button
-        className="header-settings"
-        onClick={onSettingsClick}
-        id="settings-btn"
-        aria-label="Configuración"
-      >
-        <GearIcon />
-      </button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <button
+          className="header-letter-case-btn"
+          onClick={toggleLetterCase}
+          title={letterCaseTitle}
+          aria-label={letterCaseTitle}
+          id="letter-case-toggle-btn"
+        >
+          {letterCaseLabel}
+        </button>
+        <button
+          className="header-settings"
+          onClick={onSettingsClick}
+          id="settings-btn"
+          aria-label="Configuración"
+        >
+          <GearIcon />
+        </button>
+      </div>
     </header>
   );
 }

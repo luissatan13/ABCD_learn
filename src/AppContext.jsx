@@ -120,9 +120,15 @@ export function AppProvider({ children }) {
     catch { return 'default'; }
   });
 
+  // Letter case preference: 'both' (Aa) | 'lowercase' (a) | 'uppercase' (A)
+  const [letterCase, setLetterCase] = useState(() => {
+    try { return localStorage.getItem('adl_letter_case') || 'both'; }
+    catch { return 'both'; }
+  });
+
   const [currentLevel, setCurrentLevel] = useState(1);
 
-  // Persist voice settings
+  // Persist voice and letter case settings
   useEffect(() => { localStorage.setItem('adl_voice_gender', voiceGender); }, [voiceGender]);
   useEffect(() => {
     if (voiceName) localStorage.setItem('adl_voice_name', voiceName);
@@ -130,6 +136,42 @@ export function AppProvider({ children }) {
   }, [voiceName]);
   useEffect(() => { localStorage.setItem('adl_read_speed', readSpeed.toString()); }, [readSpeed]);
   useEffect(() => { localStorage.setItem('adl_theme', theme); }, [theme]);
+  useEffect(() => { localStorage.setItem('adl_letter_case', letterCase); }, [letterCase]);
+
+  const toggleLetterCase = useCallback(() => {
+    setLetterCase(prev => {
+      if (prev === 'both') return 'lowercase';
+      if (prev === 'lowercase') return 'uppercase';
+      return 'both';
+    });
+  }, []);
+
+  const formatText = useCallback((text, type = 'auto') => {
+    if (!text || typeof text !== 'string') return text;
+
+    if (letterCase === 'uppercase') {
+      return text.toUpperCase();
+    }
+    if (letterCase === 'lowercase') {
+      return text.toLowerCase();
+    }
+
+    // letterCase === 'both'
+    const trimmed = text.trim();
+    if (type === 'letter' || (type === 'auto' && trimmed.length === 1)) {
+      return `${trimmed.toUpperCase()} ${trimmed.toLowerCase()}`;
+    }
+
+    if (type === 'syllable' || (type === 'auto' && text.length <= 4 && !text.includes(' '))) {
+      return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+    }
+
+    if (type === 'word' || (type === 'auto' && !text.includes(' '))) {
+      return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+    }
+
+    return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+  }, [letterCase]);
 
   const speak = useCallback((text, slow = false) => {
     speakText(text, voiceGender, slow, voiceName, readSpeed);
@@ -193,7 +235,7 @@ export function AppProvider({ children }) {
       profile, saveProfile,
       levels, completeLevel,
       medals, setMedals,
-      xp, currentLevel,
+      xp, setXp, currentLevel,
       mistakes, recordMistake,
       getCurrentLevel,
       getXpPercent,
@@ -203,6 +245,8 @@ export function AppProvider({ children }) {
       readSpeed, setReadSpeed,
       speak,
       theme, setTheme,
+      letterCase, setLetterCase,
+      toggleLetterCase, formatText,
     }}>
       {children}
     </AppContext.Provider>

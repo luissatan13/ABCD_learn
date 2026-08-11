@@ -186,7 +186,7 @@ function CelebrationModal({ stars, onContinue }) {
 }
 
 export function GameScreen({ level, onComplete }) {
-  const { completeLevel, recordMistake, mistakes, speak } = useApp();
+  const { completeLevel, recordMistake, mistakes, speak, formatText } = useApp();
   const [questionIndex, setQuestionIndex] = useState(0);
   const [selected, setSelected] = useState(null);
   const [feedback, setFeedback] = useState(null); // 'correct' | 'wrong'
@@ -276,19 +276,22 @@ export function GameScreen({ level, onComplete }) {
 
   // Render word with blank
   const renderWord = () => {
-    const filled = selected && feedback === 'correct' ? selected : '___';
     const syllableLen = current.answer.length;
+    const formattedAnswer = formatText(current.answer, current.answer.length === 1 ? 'letter' : 'syllable');
+    const restOfWord = current.blank === 0 ? current.word.slice(syllableLen) : current.word.slice(0, -syllableLen);
+    const formattedRest = formatText(restOfWord, 'word');
+
     const wordDisplay = current.blank === 0
       ? (
         <>
-          <span className="game-word-blank">{feedback === 'correct' ? current.answer : '___'}</span>
-          {current.word.slice(syllableLen)}
+          <span className="game-word-blank">{feedback === 'correct' ? formattedAnswer : '___'}</span>
+          {formattedRest.toLowerCase()}
         </>
       )
       : (
         <>
-          {current.word.slice(0, -syllableLen)}
-          <span className="game-word-blank">{feedback === 'correct' ? current.answer : '___'}</span>
+          {formattedRest}
+          <span className="game-word-blank">{feedback === 'correct' ? formattedAnswer : '___'}</span>
         </>
       );
     return <div className="game-word-display">{wordDisplay}</div>;
@@ -354,7 +357,7 @@ export function GameScreen({ level, onComplete }) {
                 aria-label={`Opción: ${option}`}
                 disabled={!!feedback && feedback === 'correct'}
               >
-                {option}
+                {formatText(option, option.length === 1 ? 'letter' : 'syllable')}
               </button>
             );
           })}

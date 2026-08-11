@@ -24,7 +24,7 @@ const CONSONANTS = ['M', 'P', 'S', 'L', 'B', 'C', 'D', 'F', 'G', 'T', 'R', 'V'];
 const VOWELS = ['A', 'E', 'I', 'O', 'U'];
 
 export function LecturaSilabica() {
-  const { completeLevel, speak } = useApp();
+  const { completeLevel, speak, formatText } = useApp();
   const speakSyllable = (text, slow = true) => speak(text, slow);
   const [activeTab, setActiveTab] = useState('taller'); // 'taller' | 'construye' | 'microfono'
 
@@ -202,7 +202,7 @@ export function LecturaSilabica() {
                   speakSyllable(`La letra ${c}`);
                 }}
               >
-                {c}
+                {formatText(c, 'letter')}
               </button>
             ))}
           </div>
@@ -222,8 +222,8 @@ export function LecturaSilabica() {
                     setTimeout(() => setActiveSyllableHighlight(null), 1200);
                   }}
                 >
-                  <span className="combo-formula">{selectedConsonant} + {v}</span>
-                  <span className="combo-result">{syl}</span>
+                  <span className="combo-formula">{formatText(selectedConsonant, 'letter')} + {formatText(v, 'letter')}</span>
+                  <span className="combo-result">{formatText(syl, 'syllable')}</span>
                   <span className="combo-speaker">🔊</span>
                 </button>
               );
@@ -249,7 +249,7 @@ export function LecturaSilabica() {
                   onClick={() => speakSyllable(syllable, true)}
                   aria-label={`Sílaba ${syllable}`}
                 >
-                  {syllable}
+                  {formatText(syllable, 'syllable')}
                 </button>
               ))}
             </div>
@@ -258,7 +258,7 @@ export function LecturaSilabica() {
               className="btn-primary btn-read-whole"
               onClick={() => speakSyllable(currentTallerWord.word, false)}
             >
-              🔊 Escuchar Palabra Completa: {currentTallerWord.word}
+              🔊 Escuchar Palabra Completa: {formatText(currentTallerWord.word, 'word')}
             </button>
           </div>
 
@@ -302,7 +302,7 @@ export function LecturaSilabica() {
                     key={idx}
                     className={`build-slot ${filledSyl ? 'filled' : ''} ${buildFeedback === 'correct' ? 'correct' : buildFeedback === 'wrong' ? 'wrong' : ''}`}
                   >
-                    {filledSyl || '?'}
+                    {filledSyl ? formatText(filledSyl, 'syllable') : '?'}
                   </div>
                 );
               })}
@@ -311,7 +311,7 @@ export function LecturaSilabica() {
             {/* Feedback alert */}
             {buildFeedback === 'correct' && (
               <div className="build-feedback-msg correct">
-                ¡Fantástico! Armaste <strong>{currentBuildWord.word}</strong> ⭐🎉
+                ¡Fantástico! Armaste <strong>{formatText(currentBuildWord.word, 'word')}</strong> ⭐🎉
               </div>
             )}
             {buildFeedback === 'wrong' && (
@@ -331,7 +331,7 @@ export function LecturaSilabica() {
                   onClick={() => handleSelectBuildSyllable(syllable)}
                   disabled={buildFeedback === 'correct'}
                 >
-                  {syllable}
+                  {formatText(syllable, 'syllable')}
                 </button>
               ))}
             </div>
@@ -364,13 +364,13 @@ export function LecturaSilabica() {
                     key={idx}
                     className={`mic-syllable-box ${idx === micStep ? 'active-target' : idx < micStep ? 'completed' : ''}`}
                   >
-                    {syl}
+                    {formatText(syl, 'syllable')}
                   </span>
                 ))}
               </div>
 
               <p className="mic-instruction-text">
-                Paso {micStep + 1} de {currentMicWord.syllables.length}: Di la sílaba &quot;<strong>{targetMicSyllable}</strong>&quot;
+                Paso {micStep + 1} de {currentMicWord.syllables.length}: Di la sílaba &quot;<strong>{formatText(targetMicSyllable, 'syllable')}</strong>&quot;
               </p>
             </div>
 
@@ -383,12 +383,12 @@ export function LecturaSilabica() {
             {/* Feedback */}
             {micFeedback === 'correct' && (
               <div className="mic-feedback-banner success">
-                🌟 ¡Pronunciaste perfectamente &quot;{targetMicSyllable}&quot;!
+                🌟 ¡Pronunciaste perfectamente &quot;{formatText(targetMicSyllable, 'syllable')}&quot;!
               </div>
             )}
             {micFeedback === 'wrong' && (
               <div className="mic-feedback-banner error">
-                💪 Inténtalo de nuevo. Di claro: &quot;{targetMicSyllable}&quot;
+                💪 Inténtalo de nuevo. Di claro: &quot;{formatText(targetMicSyllable, 'syllable')}&quot;
               </div>
             )}
 
@@ -398,7 +398,7 @@ export function LecturaSilabica() {
               style={{ marginTop: 12 }}
               onClick={() => speakSyllable(targetMicSyllable, true)}
             >
-              🔊 Escuchar cómo se pronuncia &quot;{targetMicSyllable}&quot;
+              🔊 Escuchar cómo se pronuncia &quot;{formatText(targetMicSyllable, 'syllable')}&quot;
             </button>
           </div>
         </div>
