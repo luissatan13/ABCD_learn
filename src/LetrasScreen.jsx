@@ -11,7 +11,7 @@ const VOCAL_DATA = [
   { letter: 'U', emoji: '🦄', word: 'UNICORNIO', color: 'vocal-u', example: 'U de Unicornio' },
 ];
 
-const CONSONANTES = ['B', 'C', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'Ñ', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z'];
+const CONSONANTES = ['B', 'C', 'D', 'F', 'G', 'J', 'K', 'L', 'M', 'N', 'Ñ', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z'];
 const VOCALES = ['A', 'E', 'I', 'O', 'U'];
 
 const getSilabasForConsonante = (consonant) => {

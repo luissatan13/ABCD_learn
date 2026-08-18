@@ -77,95 +77,114 @@ function pickVoice(type, exactVoiceName) {
 }
 
 const PHONETIC_MAP = {
-  // Syllables with U (accenting U and adding period ensures TTS speaks clear open Spanish 'u')
-  'TU': 'tú.',
-  'tu': 'tú.',
-  'Tu': 'tú.',
-  'MU': 'mú.',
-  'mu': 'mú.',
-  'Mu': 'mú.',
-  'PU': 'pú.',
-  'pu': 'pú.',
-  'Pu': 'pú.',
-  'SU': 'sú.',
-  'su': 'sú.',
-  'Su': 'sú.',
-  'LU': 'lú.',
-  'lu': 'lú.',
-  'Lu': 'lú.',
-  'BU': 'bú.',
-  'bu': 'bú.',
-  'Bu': 'bú.',
-  'CU': 'cú.',
-  'cu': 'cú.',
-  'Cu': 'cú.',
-  'DU': 'dú.',
-  'du': 'dú.',
-  'Du': 'dú.',
-  'FU': 'fú.',
-  'fu': 'fú.',
-  'Fu': 'fú.',
-  'GU': 'gú.',
-  'gu': 'gú.',
-  'Gu': 'gú.',
-  'HU': 'hú.',
-  'hu': 'hú.',
-  'Hu': 'hú.',
-  'JU': 'jú.',
-  'ju': 'jú.',
-  'Ju': 'jú.',
-  'NU': 'nú.',
-  'nu': 'nú.',
-  'Nu': 'nú.',
-  'ÑU': 'ñú.',
-  'ñu': 'ñú.',
-  'RU': 'rú.',
-  'ru': 'rú.',
-  'Ru': 'rú.',
-  'VU': 'vú.',
-  'vu': 'vú.',
-  'ZU': 'zú.',
-  'zu': 'zú.',
+  // Vocales
+  'A': 'á.', 'E': 'é.', 'I': 'í.', 'O': 'ó.', 'U': 'ú.',
+  'a': 'á.', 'e': 'é.', 'i': 'í.', 'o': 'ó.', 'u': 'ú.',
 
-  // Syllables with O
-  'TO': 'tó.', 'to': 'tó.', 'MO': 'mó.', 'mo': 'mó.',
-  'PO': 'pó.', 'po': 'pó.', 'SO': 'só.', 'so': 'só.',
-  'LO': 'ló.', 'lo': 'ló.', 'BO': 'bó.', 'bo': 'bó.',
-  'CO': 'có.', 'co': 'có.', 'DO': 'dó.', 'do': 'dó.',
-  'FO': 'fó.', 'fo': 'fó.', 'GO': 'gó.', 'go': 'gó.',
-  'HO': 'hó.', 'ho': 'hó.', 'JO': 'jó.', 'jo': 'jó.',
-  'NO': 'nó.', 'no': 'nó.', 'RO': 'ró.', 'ro': 'ró.',
-  'VO': 'vó.', 'vo': 'vó.', 'ZO': 'zó.', 'zo': 'zó.',
+  // B (Fix 'BE' saying 'bi' and 'BO' spelling out)
+  'BA': 'bá.', 'BE': 'bé.', 'BI': 'bí.', 'BO': 'bó.', 'BU': 'bú.',
+  'ba': 'bá.', 'be': 'bé.', 'bi': 'bí.', 'bo': 'bó.', 'bu': 'bú.',
+  'Ba': 'bá.', 'Be': 'bé.', 'Bi': 'bí.', 'Bo': 'bó.', 'Bu': 'bú.',
 
-  // Syllables with I
-  'TI': 'tí.', 'ti': 'tí.', 'MI': 'mí.', 'mi': 'mí.',
-  'PI': 'pí.', 'pi': 'pí.', 'SI': 'sí.', 'si': 'sí.',
-  'LI': 'lí.', 'li': 'lí.', 'BI': 'ví.', 'bi': 'ví.',
-  'DI': 'dí.', 'di': 'dí.', 'FI': 'fí.', 'fi': 'fí.',
-  'GI': 'jí.', 'gi': 'jí.', 'HI': 'hí.', 'hi': 'hí.',
-  'JI': 'jí.', 'ji': 'jí.', 'NI': 'ní.', 'ni': 'ní.',
-  'RI': 'rí.', 'ri': 'rí.', 'VI': 'ví.', 'vi': 'ví.',
-  'ZI': 'zí.', 'zi': 'zí.',
+  // C (Fix 'CO' and 'CU' spelling out)
+  'CA': 'cá.', 'CE': 'sé.', 'CI': 'sí.', 'CO': 'có.', 'CU': 'cú.',
+  'ca': 'cá.', 'ce': 'sé.', 'ci': 'sí.', 'co': 'có.', 'cu': 'cú.',
+  'Ca': 'cá.', 'Ce': 'sé.', 'Ci': 'sí.', 'Co': 'có.', 'Cu': 'cú.',
 
-  // Syllables with E
-  'TE': 'té.', 'te': 'té.', 'ME': 'mé.', 'me': 'mé.',
-  'PE': 'pé.', 'pe': 'pé.', 'SE': 'sé.', 'se': 'sé.',
-  'LE': 'lé.', 'le': 'lé.', 'BE': 'bé.', 'be': 'bé.',
-  'CE': 'sé.', 'ce': 'sé.', 'DE': 'dé.', 'de': 'dé.',
-  'FE': 'fé.', 'fe': 'fé.', 'GE': 'jé.', 'ge': 'jé.',
-  'HE': 'hé.', 'he': 'hé.', 'JE': 'jé.', 'je': 'jé.',
-  'NE': 'né.', 'ne': 'né.', 'RE': 'ré.', 're': 'ré.',
-  'VE': 'vé.', 've': 'vé.', 'ZE': 'sé.', 'ze': 'sé.',
+  // D
+  'DA': 'dá.', 'DE': 'dé.', 'DI': 'dí.', 'DO': 'dó.', 'DU': 'dú.',
+  'da': 'dá.', 'de': 'dé.', 'di': 'dí.', 'do': 'dó.', 'du': 'dú.',
+  'Da': 'dá.', 'De': 'dé.', 'Di': 'dí.', 'Do': 'dó.', 'Du': 'dú.',
 
-  // Syllables with A
-  'TA': 'tá.', 'ta': 'tá.', 'MA': 'má.', 'ma': 'má.',
-  'PA': 'pá.', 'pa': 'pá.', 'SA': 'sá.', 'sa': 'sá.',
-  'LA': 'lá.', 'la': 'lá.', 'BA': 'bá.', 'ba': 'bá.',
-  'CA': 'cá.', 'ca': 'cá.', 'DA': 'dá.', 'da': 'dá.',
-  'FA': 'fá.', 'fa': 'fá.', 'GA': 'gá.', 'ga': 'gá.',
-  'HA': 'há.', 'ha': 'há.', 'JA': 'já.', 'ja': 'já.',
-  'NA': 'ná.', 'na': 'ná.', 'RA': 'rá.', 'ra': 'rá.',
-  'VA': 'vá.', 'va': 'vá.', 'ZA': 'zá.', 'za': 'zá.',
+  // F
+  'FA': 'fá.', 'FE': 'fé.', 'FI': 'fí.', 'FO': 'fó.', 'FU': 'fú.',
+  'fa': 'fá.', 'fe': 'fé.', 'fi': 'fí.', 'fo': 'fó.', 'fu': 'fú.',
+  'Fa': 'fá.', 'Fe': 'fé.', 'Fi': 'fí.', 'Fo': 'fó.', 'Fu': 'fú.',
+
+  // G (Fix 'GI' sounding like 'ji' and 'GU' spelling out)
+  'GA': 'gá.', 'GE': 'jé.', 'GI': 'jí.', 'GO': 'gó.', 'GU': 'gú.',
+  'ga': 'gá.', 'ge': 'jé.', 'gi': 'jí.', 'go': 'gó.', 'gu': 'gú.',
+  'Ga': 'gá.', 'Ge': 'jé.', 'Gi': 'jí.', 'Go': 'gó.', 'Gu': 'gú.',
+
+  // J (Fix 'JU' spelling out)
+  'JA': 'já.', 'JE': 'jé.', 'JI': 'jí.', 'JO': 'jó.', 'JU': 'jú.',
+  'ja': 'já.', 'je': 'jé.', 'ji': 'jí.', 'jo': 'jó.', 'ju': 'jú.',
+  'Ja': 'já.', 'Je': 'jé.', 'Ji': 'jí.', 'Jo': 'jó.', 'Ju': 'jú.',
+
+  // K (Fix 'KI', 'KO', 'KU' spelling out)
+  'KA': 'cá.', 'KE': 'qué.', 'KI': 'quí.', 'KO': 'có.', 'KU': 'cú.',
+  'ka': 'cá.', 'ke': 'qué.', 'ki': 'quí.', 'ko': 'có.', 'ku': 'cú.',
+  'Ka': 'cá.', 'Ke': 'qué.', 'Ki': 'quí.', 'Ko': 'có.', 'Ku': 'cú.',
+
+  // L
+  'LA': 'lá.', 'LE': 'lé.', 'LI': 'lí.', 'LO': 'ló.', 'LU': 'lú.',
+  'la': 'lá.', 'le': 'lé.', 'li': 'lí.', 'lo': 'ló.', 'lu': 'lú.',
+  'La': 'lá.', 'Le': 'lé.', 'Li': 'lí.', 'Lo': 'ló.', 'Lu': 'lú.',
+
+  // M (Fix 'MO' spelling out)
+  'MA': 'má.', 'ME': 'mé.', 'MI': 'mí.', 'MO': 'mó.', 'MU': 'mú.',
+  'ma': 'má.', 'me': 'mé.', 'mi': 'mí.', 'mo': 'mó.', 'mu': 'mú.',
+  'Ma': 'má.', 'Me': 'mé.', 'Mi': 'mí.', 'Mo': 'mó.', 'Mu': 'mú.',
+
+  // N (Fix 'NA' saying 'sodio' [Sodium] and 'NU' spelling out)
+  'NA': 'ná.', 'NE': 'né.', 'NI': 'ní.', 'NO': 'nó.', 'NU': 'nú.',
+  'na': 'ná.', 'ne': 'né.', 'ni': 'ní.', 'no': 'nó.', 'nu': 'nú.',
+  'Na': 'ná.', 'Ne': 'né.', 'Ni': 'ní.', 'No': 'nó.', 'Nu': 'nú.',
+
+  // Ñ (Fix ÑA, ÑE, ÑI, ÑO, ÑU spelling out)
+  'ÑA': 'ñá.', 'ÑE': 'ñé.', 'ÑI': 'ñí.', 'ÑO': 'ñó.', 'ÑU': 'ñú.',
+  'ña': 'ñá.', 'ñe': 'ñé.', 'ñi': 'ñí.', 'ño': 'ñó.', 'ñu': 'ñú.',
+  'Ña': 'ñá.', 'Ñe': 'ñé.', 'Ñi': 'ñí.', 'Ño': 'ñó.', 'Ñu': 'ñú.',
+
+  // P
+  'PA': 'pá.', 'PE': 'pé.', 'PI': 'pí.', 'PO': 'pó.', 'PU': 'pú.',
+  'pa': 'pá.', 'pe': 'pé.', 'pi': 'pí.', 'po': 'pó.', 'pu': 'pú.',
+  'Pa': 'pá.', 'Pe': 'pé.', 'Pi': 'pí.', 'Po': 'pó.', 'Pu': 'pú.',
+
+  // Q (Fix 'QUI' spelling out)
+  'QUE': 'qué.', 'QUI': 'quí.',
+  'que': 'qué.', 'qui': 'quí.',
+  'Que': 'qué.', 'Qui': 'quí.',
+
+  // R (Fix 'RI', 'RO', 'RU' spelling out)
+  'RA': 'rá.', 'RE': 'ré.', 'RI': 'rí.', 'RO': 'ró.', 'RU': 'rú.',
+  'ra': 'rá.', 're': 'ré.', 'ri': 'rí.', 'ro': 'ró.', 'ru': 'rú.',
+  'Ra': 'rá.', 'Re': 'ré.', 'Ri': 'rí.', 'Ro': 'ró.', 'Ru': 'rú.',
+
+  // S (Fix 'SA' spelling out)
+  'SA': 'sá.', 'SE': 'sé.', 'SI': 'sí.', 'SO': 'só.', 'SU': 'sú.',
+  'sa': 'sá.', 'se': 'sé.', 'si': 'sí.', 'so': 'só.', 'su': 'sú.',
+  'Sa': 'sá.', 'Se': 'sé.', 'Si': 'sí.', 'So': 'só.', 'Su': 'sú.',
+
+  // T
+  'TA': 'tá.', 'TE': 'té.', 'TI': 'tí.', 'TO': 'tó.', 'TU': 'tú.',
+  'ta': 'tá.', 'te': 'té.', 'ti': 'tí.', 'to': 'tó.', 'tu': 'tú.',
+  'Ta': 'tá.', 'Te': 'té.', 'Ti': 'tí.', 'To': 'tó.', 'Tu': 'tú.',
+
+  // V (Fix 'VO', 'VU' spelling out)
+  'VA': 'vá.', 'VE': 'vé.', 'VI': 'ví.', 'VO': 'vó.', 'VU': 'vú.',
+  'va': 'vá.', 've': 'vé.', 'vi': 'ví.', 'vo': 'vó.', 'vu': 'vú.',
+  'Va': 'vá.', 'Ve': 'vé.', 'Vi': 'ví.', 'Vo': 'vó.', 'Vu': 'vú.',
+
+  // W (Fix WA, WE, WI, WO, WU spelling out)
+  'WA': 'guá.', 'WE': 'gué.', 'WI': 'guí.', 'WO': 'guó.', 'WU': 'gú.',
+  'wa': 'guá.', 'we': 'gué.', 'wi': 'guí.', 'wo': 'guó.', 'wu': 'gú.',
+  'Wa': 'guá.', 'We': 'gué.', 'Wi': 'guí.', 'Wo': 'guó.', 'Wu': 'gú.',
+
+  // X (Fix 'XI' saying 'once' [Roman 11] and X spelling out)
+  'XA': 'sá.', 'XE': 'sé.', 'XI': 'sí.', 'XO': 'só.', 'XU': 'sú.',
+  'xa': 'sá.', 'xe': 'sé.', 'xi': 'sí.', 'xo': 'só.', 'xu': 'sú.',
+  'Xa': 'sá.', 'Xe': 'sé.', 'Xi': 'sí.', 'Xo': 'só.', 'Xu': 'sú.',
+
+  // Y (Fix 'YU' spelling out)
+  'YA': 'yá.', 'YE': 'yé.', 'YI': 'yí.', 'YO': 'yó.', 'YU': 'yú.',
+  'ya': 'yá.', 'ye': 'yé.', 'yi': 'yí.', 'yo': 'yó.', 'yu': 'yú.',
+  'Ya': 'yá.', 'Ye': 'yé.', 'Yi': 'yí.', 'Yo': 'yó.', 'Yu': 'yú.',
+
+  // Z (Fix ZA, ZE, ZI, ZO, ZU spelling out)
+  'ZA': 'sá.', 'ZE': 'sé.', 'ZI': 'sí.', 'ZO': 'só.', 'ZU': 'sú.',
+  'za': 'sá.', 'ze': 'sé.', 'zi': 'sí.', 'zo': 'só.', 'zu': 'sú.',
+  'Za': 'sá.', 'Ze': 'sé.', 'Zi': 'sí.', 'Zo': 'só.', 'Zu': 'sú.',
 
   // Words & letters
   'JUGO': 'hugo',
@@ -180,17 +199,15 @@ function getSpokenText(text) {
   const trimmed = text.trim();
   const uppercase = trimmed.toUpperCase();
 
-  if (PHONETIC_MAP[uppercase]) return PHONETIC_MAP[uppercase];
   if (PHONETIC_MAP[trimmed]) return PHONETIC_MAP[trimmed];
+  if (PHONETIC_MAP[uppercase]) return PHONETIC_MAP[uppercase];
 
-  // Dynamic fallback for isolated short syllables ending in U
-  if (/^[A-ZÑa-zñ]{1,3}[uU]$/.test(trimmed)) {
-    return trimmed.slice(0, -1) + 'ú.';
-  }
-  if (/^[A-ZÑa-zñ]{1,3}[oO]$/.test(trimmed)) return trimmed.slice(0, -1) + 'ó.';
-  if (/^[A-ZÑa-zñ]{1,3}[iI]$/.test(trimmed)) return trimmed.slice(0, -1) + 'í.';
-  if (/^[A-ZÑa-zñ]{1,3}[eE]$/.test(trimmed)) return trimmed.slice(0, -1) + 'é.';
-  if (/^[A-ZÑa-zñ]{1,3}[aA]$/.test(trimmed)) return trimmed.slice(0, -1) + 'á.';
+  // Dynamic fallback for isolated short syllables (1 to 3 letters)
+  if (/^[A-ZÑa-zñ]{1,3}[uU]$/.test(trimmed)) return trimmed.slice(0, -1).toLowerCase() + 'ú.';
+  if (/^[A-ZÑa-zñ]{1,3}[oO]$/.test(trimmed)) return trimmed.slice(0, -1).toLowerCase() + 'ó.';
+  if (/^[A-ZÑa-zñ]{1,3}[iI]$/.test(trimmed)) return trimmed.slice(0, -1).toLowerCase() + 'í.';
+  if (/^[A-ZÑa-zñ]{1,3}[eE]$/.test(trimmed)) return trimmed.slice(0, -1).toLowerCase() + 'é.';
+  if (/^[A-ZÑa-zñ]{1,3}[aA]$/.test(trimmed)) return trimmed.slice(0, -1).toLowerCase() + 'á.';
 
   return text;
 }

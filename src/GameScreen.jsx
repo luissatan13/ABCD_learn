@@ -85,10 +85,6 @@ const ALL_GAME_DATA = [
   { word: 'GATO', blank: 0, answer: 'GA', options: ['GA', 'MA', 'PA'], emoji: '🐱', hint: 'Hace miau', target: 'G' },
   { word: 'GOTA', blank: 0, answer: 'GO', options: ['GO', 'MO', 'BO'], emoji: '💧', hint: 'Una gota de agua', target: 'G' },
 
-  // H
-  { word: 'HELADO', blank: 0, answer: 'HE', options: ['HE', 'ME', 'PE'], emoji: '🍦', hint: 'Postre frío y rico', target: 'H' },
-  { word: 'HUEVO', blank: 0, answer: 'HU', options: ['HU', 'MU', 'PU'], emoji: '🥚', hint: 'Lo pone la gallina', target: 'H' },
-
   // J
   { word: 'JABÓN', blank: 0, answer: 'JA', options: ['JA', 'MA', 'PA'], emoji: '🧼', hint: 'Para lavarse las manos', target: 'J' },
   { word: 'JUGO', blank: 0, answer: 'JU', options: ['JU', 'MU', 'LU'], emoji: '🧃', hint: 'Bebida de frutas', target: 'J' },
