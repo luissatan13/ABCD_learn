@@ -13,7 +13,7 @@ import { SettingsModal } from './SettingsModal';
 import { PaywallModal } from './PaywallModal';
 
 function App() {
-  const { user, profile, theme, showPaywall, setShowPaywall, activatePremium } = useApp();
+  const { user, profile, authLoading, theme, showPaywall, setShowPaywall, activatePremium } = useApp();
   const [activeTab, setActiveTab] = useState('mapa');
   const [showSettings, setShowSettings] = useState(false);
   const [currentGame, setCurrentGame] = useState(null); // level object
@@ -49,6 +49,20 @@ function App() {
       root.classList.add(`theme-${theme}`);
     }
   }, [theme]);
+
+  // ---- AUTH LOADING ----
+  if (authLoading) {
+    return (
+      <div className="login-screen" style={{ justifyContent: 'center', alignItems: 'center', display: 'flex', flexDirection: 'column' }}>
+        <div className="login-mascot-card" style={{ width: 100, height: 100 }}>
+          <img src="/owl_mascot.png" alt="Cargando..." style={{ animation: 'bounce 1s infinite alternate' }} />
+        </div>
+        <p style={{ color: 'white', marginTop: 16, fontWeight: 'bold', fontSize: 18, fontFamily: 'Nunito, sans-serif' }}>
+          Cargando tu progreso mágico... ✨
+        </p>
+      </div>
+    );
+  }
 
   // ---- AUTH FLOW ----
   if (!user) {

@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { speakText } from './speechUtils';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { db } from './firebase';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { db, auth } from './firebase';
 import { isVipEmail } from './vipEmails';
 
 const AppContext = createContext(null);
@@ -55,6 +56,8 @@ const INITIAL_MEDALS = [
 ];
 
 export function AppProvider({ children }) {
+  const [authLoading, setAuthLoading] = useState(true);
+
   const [user, setUser] = useState(() => {
     try {
       const savedUser = JSON.parse(localStorage.getItem('adl_user'));
@@ -209,10 +212,12 @@ export function AppProvider({ children }) {
 
   useEffect(() => {
     if (user) localStorage.setItem('adl_user', JSON.stringify(user));
+    else localStorage.removeItem('adl_user');
   }, [user]);
 
   useEffect(() => {
     if (profile) localStorage.setItem('adl_profile', JSON.stringify(profile));
+    else localStorage.removeItem('adl_profile');
   }, [profile]);
 
   useEffect(() => {
@@ -231,45 +236,61 @@ export function AppProvider({ children }) {
     localStorage.setItem('adl_mistakes', JSON.stringify(mistakes));
   }, [mistakes]);
 
-  // ---- FIRESTORE CLOUD PROGRESS SYNC ----
-  // 1. Fetch user progress from cloud on login/load
+  // ---- FIREBASE AUTH LISTENER & FIRESTORE CLOUD PROGRESS SYNC ----
   useEffect(() => {
-    if (!user || !user.sub || user.sub === 'guest-123') return;
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        const u = {
+          name: firebaseUser.displayName || 'Explorador',
+          email: firebaseUser.email || '',
+          picture: firebaseUser.photoURL || '/owl_mascot.png',
+          sub: firebaseUser.uid,
+        };
+        setUser(u);
+        localStorage.setItem('adl_user', JSON.stringify(u));
 
-    const loadCloudProgress = async () => {
-      try {
-        const userRef = doc(db, 'users', user.sub);
-        const docSnap = await getDoc(userRef);
-        if (docSnap.exists()) {
-          const cloud = docSnap.data();
-          if (cloud.profile) setProfile(cloud.profile);
-          if (cloud.levels && Array.isArray(cloud.levels)) setLevels(cloud.levels);
-          if (cloud.medals && Array.isArray(cloud.medals)) setMedals(cloud.medals);
-          if (typeof cloud.xp === 'number') setXp(cloud.xp);
-          if (cloud.mistakes) setMistakes(cloud.mistakes);
-        } else {
-          // Initialize user progress in Firestore
-          await setDoc(userRef, {
-            user,
-            profile: profile || null,
-            levels,
-            medals,
-            xp,
-            mistakes,
-            updatedAt: new Date().toISOString(),
-          });
+        // Fetch user progress from Firestore for this account
+        try {
+          const userRef = doc(db, 'users', firebaseUser.uid);
+          const docSnap = await getDoc(userRef);
+          if (docSnap.exists()) {
+            const cloud = docSnap.data();
+            if (cloud.profile) {
+              setProfile(cloud.profile);
+              localStorage.setItem('adl_profile', JSON.stringify(cloud.profile));
+            }
+            if (cloud.levels && Array.isArray(cloud.levels)) {
+              setLevels(cloud.levels);
+              localStorage.setItem('adl_levels', JSON.stringify(cloud.levels));
+            }
+            if (cloud.medals && Array.isArray(cloud.medals)) {
+              setMedals(cloud.medals);
+              localStorage.setItem('adl_medals', JSON.stringify(cloud.medals));
+            }
+            if (typeof cloud.xp === 'number') {
+              setXp(cloud.xp);
+              localStorage.setItem('adl_xp', cloud.xp.toString());
+            }
+            if (cloud.mistakes) {
+              setMistakes(cloud.mistakes);
+              localStorage.setItem('adl_mistakes', JSON.stringify(cloud.mistakes));
+            }
+          }
+        } catch (err) {
+          console.warn('Error loading cloud profile on auth change:', err);
         }
-      } catch (err) {
-        console.warn('Sync cloud info:', err);
+      } else {
+        setUser(null);
       }
-    };
+      setAuthLoading(false);
+    });
 
-    loadCloudProgress();
-  }, [user?.sub]);
+    return () => unsubscribe();
+  }, []);
 
-  // 2. Auto-save changes to Firestore when progress updates
+  // Auto-save changes to Firestore when progress updates (only when profile is valid)
   useEffect(() => {
-    if (!user || !user.sub || user.sub === 'guest-123') return;
+    if (!user || !user.sub || user.sub === 'guest-123' || !profile) return;
 
     const saveCloudProgress = async () => {
       try {
@@ -292,9 +313,39 @@ export function AppProvider({ children }) {
     return () => clearTimeout(timer);
   }, [user, profile, levels, medals, xp, mistakes]);
 
-  const login = (googleUser) => { setUser(googleUser); };
-  const logout = () => { setUser(null); setProfile(null); };
-  const saveProfile = (profileData) => { setProfile(profileData); };
+  const login = (googleUser) => {
+    setUser(googleUser);
+    localStorage.setItem('adl_user', JSON.stringify(googleUser));
+  };
+
+  const logout = async () => {
+    try {
+      await signOut(auth);
+    } catch (err) {
+      console.warn('Signout error:', err);
+    }
+    setUser(null);
+    setProfile(null);
+    setLevels(INITIAL_LEVELS);
+    setMedals(INITIAL_MEDALS);
+    setXp(120);
+    setMistakes({});
+    localStorage.removeItem('adl_user');
+    localStorage.removeItem('adl_profile');
+    localStorage.removeItem('adl_levels');
+    localStorage.removeItem('adl_medals');
+    localStorage.removeItem('adl_xp');
+    localStorage.removeItem('adl_mistakes');
+  };
+
+  const saveProfile = (profileData) => {
+    setProfile(profileData);
+    localStorage.setItem('adl_profile', JSON.stringify(profileData));
+    if (user && user.sub && user.sub !== 'guest-123') {
+      const userRef = doc(db, 'users', user.sub);
+      setDoc(userRef, { profile: profileData }, { merge: true }).catch(err => console.warn('Save profile cloud error:', err));
+    }
+  };
 
   const completeLevel = (levelId, stars) => {
     setLevels(prev => {
@@ -324,6 +375,7 @@ export function AppProvider({ children }) {
     <AppContext.Provider value={{
       user, login, logout,
       profile, saveProfile,
+      authLoading,
       levels, completeLevel,
       medals, setMedals,
       xp, setXp, currentLevel,
