@@ -3,13 +3,13 @@ import { useApp } from './AppContext';
 import { PUZZLES } from './puzzleData';
 
 function StarRain() {
-  const stars = Array.from({ length: 20 }, (_, i) => ({
+  const stars = React.useMemo(() => Array.from({ length: 20 }, (_, i) => ({
     id: i,
-    left: Math.random() * 100,
-    delay: Math.random() * 0.5,
-    duration: 1 + Math.random() * 0.8,
-    emoji: ['⭐', '🌟', '✨', '🦄', '👸', '🔥'][Math.floor(Math.random() * 6)],
-  }));
+    left: (i * 17 + 5) % 100,
+    delay: (i * 0.1) % 0.5,
+    duration: 1 + (i % 5) * 0.2,
+    emoji: ['⭐', '🌟', '✨', '🦄', '👸', '🔥'][i % 6],
+  })), []);
 
   return (
     <div className="star-rain" aria-hidden="true">

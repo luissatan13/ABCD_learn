@@ -1,54 +1,35 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { SpeechMicButton } from './SpeechMicButton';
 import { useApp } from './AppContext';
+import { ALL_CONSONANTS, WORDS_BY_CONSONANT } from './syllableData';
 
-// Words dataset decomposed into syllables
-const WORDS_BY_SYLLABLES = [
-  { id: 'mama', word: 'MAMÁ', syllables: ['MA', 'MÁ'], emoji: '👩', category: 'Fácil' },
-  { id: 'mesa', word: 'MESA', syllables: ['ME', 'SA'], emoji: '🍽️', category: 'Fácil' },
-  { id: 'mono', word: 'MONO', syllables: ['MO', 'NO'], emoji: '🐒', category: 'Fácil' },
-  { id: 'sapo', word: 'SAPO', syllables: ['SA', 'PO'], emoji: '🐸', category: 'Fácil' },
-  { id: 'luna', word: 'LUNA', syllables: ['LU', 'NA'], emoji: '🌙', category: 'Fácil' },
-  { id: 'perro', word: 'PERRO', syllables: ['PE', 'RRO'], emoji: '🐶', category: 'Media' },
-  { id: 'gato', word: 'GATO', syllables: ['GA', 'TO'], emoji: '🐱', category: 'Fácil' },
-  { id: 'barco', word: 'BARCO', syllables: ['BAR', 'CO'], emoji: '⛵', category: 'Media' },
-  { id: 'casa', word: 'CASA', syllables: ['CA', 'SA'], emoji: '🏠', category: 'Fácil' },
-  { id: 'dado', word: 'DADO', syllables: ['DA', 'DO'], emoji: '🎲', category: 'Fácil' },
-  { id: 'pelota', word: 'PELOTA', syllables: ['PE', 'LO', 'TA'], emoji: '⚽', category: 'Avanzada' },
-  { id: 'conejo', word: 'CONEJO', syllables: ['CO', 'NE', 'JO'], emoji: '🐰', category: 'Avanzada' },
-  { id: 'zapato', word: 'ZAPATO', syllables: ['ZA', 'PA', 'TO'], emoji: '👞', category: 'Avanzada' },
-  { id: 'tomate', word: 'TOMATE', syllables: ['TO', 'MA', 'TE'], emoji: '🍅', category: 'Avanzada' },
-];
-
-const CONSONANTS = ['M', 'P', 'S', 'L', 'B', 'C', 'D', 'F', 'G', 'T', 'R', 'V'];
 const VOWELS = ['A', 'E', 'I', 'O', 'U'];
 
 export function LecturaSilabica() {
-  const { completeLevel, speak, formatText } = useApp();
+  const { setXp, speak, formatText } = useApp();
   const speakSyllable = (text, slow = true) => speak(text, slow);
+
   const [activeTab, setActiveTab] = useState('taller'); // 'taller' | 'construye' | 'microfono'
 
-  // State for Taller (Consonant + Vowel grid)
-  const [selectedConsonant, setSelectedConsonant] = useState('M');
-  const [selectedWordIndex, setSelectedWordIndex] = useState(0);
+  // State for Consonant and 25 Exercises per consonant
+  const [selectedConsonant, setSelectedConsonant] = useState('B');
+  const [exerciseIndex, setExerciseIndex] = useState(0);
   const [activeSyllableHighlight, setActiveSyllableHighlight] = useState(null);
+
+  // State for Microphone Validation Feedback
+  const [micResultStatus, setMicResultStatus] = useState(null); // 'correct' | 'wrong' | null
+  const [completedCount, setCompletedCount] = useState(0);
+
+  // Active exercises for selected consonant (25 words)
+  const currentConsonantWords = WORDS_BY_CONSONANT[selectedConsonant] || WORDS_BY_CONSONANT['B'];
+  const currentWordObj = currentConsonantWords[exerciseIndex % currentConsonantWords.length];
 
   // State for "Construye la Palabra"
   const [buildIndex, setBuildIndex] = useState(0);
   const [userBuiltSyllables, setUserBuiltSyllables] = useState([]);
   const [buildFeedback, setBuildFeedback] = useState(null);
 
-  // State for "Micrófono por Sílabas"
-  const [micWordIndex, setMicWordIndex] = useState(0);
-  const [micStep, setMicStep] = useState(0); // Syllable index in word
-  const [micFeedback, setMicFeedback] = useState(null);
-  const [micScore, setMicScore] = useState(0);
-
-  // Active word in Taller
-  const currentTallerWord = WORDS_BY_SYLLABLES[selectedWordIndex];
-
-  // Active word in Construye
-  const currentBuildWord = WORDS_BY_SYLLABLES[buildIndex];
+  const currentBuildWord = currentConsonantWords[buildIndex % currentConsonantWords.length];
 
   // Distractor syllables for Construye
   const buildOptions = React.useMemo(() => {
@@ -61,13 +42,53 @@ export function LecturaSilabica() {
     return [...correct, ...extra].sort(() => 0.5 - Math.random());
   }, [currentBuildWord]);
 
-  // Active word in Micrófono
-  const currentMicWord = WORDS_BY_SYLLABLES[micWordIndex];
-  const targetMicSyllable = currentMicWord ? currentMicWord.syllables[micStep] : '';
+  // Handle consonant selection
+  const handleConsonantSelect = (consonant) => {
+    setSelectedConsonant(consonant);
+    setExerciseIndex(0);
+    setBuildIndex(0);
+    setUserBuiltSyllables([]);
+    setBuildFeedback(null);
+    setMicResultStatus(null);
+    speakSyllable(`Letra ${consonant}`);
+  };
 
-  // ----------------------------------------------------
-  // HANDLERS FOR CONSTRUYE LA PALABRA
-  // ----------------------------------------------------
+  // Handle next / prev exercise
+  const handleNextExercise = () => {
+    setMicResultStatus(null);
+    setExerciseIndex(prev => (prev < currentConsonantWords.length - 1 ? prev + 1 : 0));
+  };
+
+  const handlePrevExercise = () => {
+    setMicResultStatus(null);
+    setExerciseIndex(prev => (prev > 0 ? prev - 1 : currentConsonantWords.length - 1));
+  };
+
+  // Microphone Result Handler with Voice Validation
+  const handleMicValidation = (result) => {
+    if (result.success) {
+      setMicResultStatus('correct');
+      setCompletedCount(prev => prev + 1);
+      if (typeof setXp === 'function') {
+        setXp(prev => prev + 15);
+      }
+      speakSyllable(`¡Fantástico! Pronunciaste muy bien ${currentWordObj.word}`, false);
+
+      // Auto advance to next exercise after 1.8s celebration
+      setTimeout(() => {
+        setMicResultStatus(null);
+        handleNextExercise();
+      }, 1800);
+    } else {
+      setMicResultStatus('wrong');
+      speakSyllable(`Intenta de nuevo diciendo ${currentWordObj.word}`, true);
+      setTimeout(() => {
+        setMicResultStatus(null);
+      }, 2500);
+    }
+  };
+
+  // Handlers for "Construye la palabra"
   const handleSelectBuildSyllable = (syllable) => {
     if (buildFeedback === 'correct') return;
     speak(syllable, true);
@@ -77,7 +98,6 @@ export function LecturaSilabica() {
 
     const targetSyllables = currentBuildWord.syllables;
 
-    // Check if the partial selection matches target prefix
     for (let i = 0; i < nextBuilt.length; i++) {
       if (nextBuilt[i] !== targetSyllables[i]) {
         setBuildFeedback('wrong');
@@ -90,23 +110,16 @@ export function LecturaSilabica() {
       }
     }
 
-    // If completed full word
     if (nextBuilt.length === targetSyllables.length) {
       setBuildFeedback('correct');
+      speakSyllable(`¡Muy bien! ¡${currentBuildWord.word}!`, false);
+      if (typeof setXp === 'function') {
+        setXp(prev => prev + 20);
+      }
       setTimeout(() => {
-        speakSyllable(`¡Muy bien! ¡${currentBuildWord.word}!`, false);
-      }, 300);
-
-      setTimeout(() => {
-        if (buildIndex < WORDS_BY_SYLLABLES.length - 1) {
-          setBuildIndex(i => i + 1);
-          setUserBuiltSyllables([]);
-          setBuildFeedback(null);
-        } else {
-          setBuildIndex(0);
-          setUserBuiltSyllables([]);
-          setBuildFeedback(null);
-        }
+        setUserBuiltSyllables([]);
+        setBuildFeedback(null);
+        setBuildIndex(prev => (prev < currentConsonantWords.length - 1 ? prev + 1 : 0));
       }, 1800);
     }
   };
@@ -114,44 +127,6 @@ export function LecturaSilabica() {
   const handleResetBuild = () => {
     setUserBuiltSyllables([]);
     setBuildFeedback(null);
-  };
-
-  // ----------------------------------------------------
-  // HANDLERS FOR MICRÓFONO POR SÍLABAS
-  // ----------------------------------------------------
-  const handleMicResult = (result) => {
-    if (result.success) {
-      setMicFeedback('correct');
-      speakSyllable(`¡Excelente! ${targetMicSyllable}`);
-      setMicScore(s => s + 10);
-
-      setTimeout(() => {
-        if (micStep < currentMicWord.syllables.length - 1) {
-          setMicStep(s => s + 1);
-          setMicFeedback(null);
-        } else {
-          // Completed all syllables of this word!
-          speakSyllable(`¡Leíste ${currentMicWord.word}! ¡Felicitaciones!`, false);
-          setTimeout(() => {
-            if (micWordIndex < WORDS_BY_SYLLABLES.length - 1) {
-              setMicWordIndex(i => i + 1);
-              setMicStep(0);
-              setMicFeedback(null);
-            } else {
-              setMicWordIndex(0);
-              setMicStep(0);
-              setMicFeedback(null);
-            }
-          }, 1500);
-        }
-      }, 1000);
-    } else {
-      setMicFeedback('wrong');
-      speakSyllable(`Intenta decir: ${targetMicSyllable}`, true);
-      setTimeout(() => {
-        setMicFeedback(null);
-      }, 1200);
-    }
   };
 
   return (
@@ -167,87 +142,128 @@ export function LecturaSilabica() {
           📖 Taller de Sílabas
         </button>
         <button
-          className={`silabica-tab-btn ${activeTab === 'construye' ? 'active' : ''}`}
-          onClick={() => setActiveTab('construye')}
-          role="tab"
-          aria-selected={activeTab === 'construye'}
-        >
-          🧩 Construye Palabras
-        </button>
-        <button
           className={`silabica-tab-btn ${activeTab === 'microfono' ? 'active' : ''}`}
           onClick={() => setActiveTab('microfono')}
           role="tab"
           aria-selected={activeTab === 'microfono'}
         >
-          🎙️ Lectura con Micrófono
+          🎙️ Práctica con Micrófono
         </button>
+        <button
+          className={`silabica-tab-btn ${activeTab === 'construye' ? 'active' : ''}`}
+          onClick={() => setActiveTab('construye')}
+          role="tab"
+          aria-selected={activeTab === 'construye'}
+        >
+          🧩 Armador de Palabras
+        </button>
+      </div>
+
+      {/* Consonant Selector (All 20 Consonants, Omitting H) */}
+      <div className="card" style={{ padding: '12px 16px', background: 'var(--bg-card)' }}>
+        <p className="silabica-desc" style={{ marginBottom: 8, fontWeight: 800 }}>
+          🔤 Selecciona una consonante (Sin la &quot;H&quot;):
+        </p>
+        <div className="consonant-scroll" style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
+          {ALL_CONSONANTS.map(c => (
+            <button
+              key={c}
+              id={`consonant-pill-${c}`}
+              className={`consonant-pill ${selectedConsonant === c ? 'active' : ''}`}
+              onClick={() => handleConsonantSelect(c)}
+              style={{
+                minWidth: 42,
+                height: 42,
+                borderRadius: '50%',
+                fontSize: 16,
+                fontWeight: 900,
+                flexShrink: 0,
+              }}
+            >
+              {formatText(c, 'letter')}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* ================= TAB 1: TALLER DE SÍLABAS ================= */}
       {activeTab === 'taller' && (
         <div className="silabica-card card">
-          <h2 className="silabica-title">🔤 Aprende a Formar Sílabas</h2>
-          <p className="silabica-desc">Toca una consonante y escucha cómo suena al unirse con cada vocal:</p>
+          <h2 className="silabica-title">🔤 Sílabas con la Letra {formatText(selectedConsonant, 'letter')}</h2>
+          <p className="silabica-desc">Escucha cómo suena al unirse con cada vocal:</p>
 
-          {/* Consonant Selector */}
-          <div className="consonant-scroll">
-            {CONSONANTS.map(c => (
-              <button
-                key={c}
-                id={`taller-consonant-${c}`}
-                className={`consonant-pill ${selectedConsonant === c ? 'active' : ''}`}
-                onClick={() => {
-                  setSelectedConsonant(c);
-                  speakSyllable(`La letra ${c}`);
-                }}
-              >
-                {formatText(c, 'letter')}
-              </button>
-            ))}
-          </div>
-
-          {/* Combined Syllables Row */}
-          <div className="syllable-combo-grid">
+          {/* Syllable Combinations Row */}
+          <div className="syllable-combo-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(64px, 1fr))', gap: 8 }}>
             {VOWELS.map(v => {
-              const syl = selectedConsonant + v;
+              let syl = selectedConsonant + v;
+              if (selectedConsonant === 'Q') {
+                syl = v === 'E' || v === 'I' ? 'QU' + v : 'QUE';
+              }
               return (
                 <button
-                  key={syl}
-                  id={`combo-${syl}`}
-                  className="syllable-combo-card"
+                  key={v}
+                  id={`combo-${selectedConsonant}-${v}`}
+                  className={`syllable-combo-card ${activeSyllableHighlight === syl ? 'active' : ''}`}
                   onClick={() => {
                     setActiveSyllableHighlight(syl);
                     speakSyllable(`${selectedConsonant} con ${v}... ¡${syl}!`, true);
                     setTimeout(() => setActiveSyllableHighlight(null), 1200);
                   }}
+                  style={{
+                    padding: '12px 6px',
+                    borderRadius: '16px',
+                    border: '1.5px solid var(--border-strong)',
+                    background: 'var(--bg-card-2)',
+                    color: 'white',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                  }}
                 >
-                  <span className="combo-formula">{formatText(selectedConsonant, 'letter')} + {formatText(v, 'letter')}</span>
-                  <span className="combo-result">{formatText(syl, 'syllable')}</span>
-                  <span className="combo-speaker">🔊</span>
+                  <span className="combo-formula" style={{ fontSize: 11, opacity: 0.8 }}>{selectedConsonant}+{v}</span>
+                  <span className="combo-result" style={{ fontSize: 20, fontWeight: 900, color: '#FCD34D' }}>{formatText(syl, 'syllable')}</span>
+                  <span className="combo-speaker" style={{ fontSize: 12 }}>🔊</span>
                 </button>
               );
             })}
           </div>
 
-          <hr className="silabica-divider" />
+          <hr className="silabica-divider" style={{ margin: '16px 0', borderColor: 'var(--border)' }} />
 
-          {/* Word Decomposition Section */}
-          <h3 className="silabica-subtitle">📖 Lectura de Palabras por Sílabas</h3>
-          <p className="silabica-desc">Toca cada ficha para pronunciar su sílaba:</p>
+          {/* 25 Exercises Header */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <h3 className="silabica-subtitle" style={{ margin: 0 }}>
+              📖 Ejercicio {exerciseIndex + 1} de 25
+            </h3>
+            <span style={{ fontSize: 13, color: 'var(--gold)', fontWeight: 800 }}>
+              Letra {selectedConsonant}
+            </span>
+          </div>
 
-          <div className="word-decom-card">
-            <div className="word-decom-emoji">{currentTallerWord.emoji}</div>
+          {/* Active Word Card */}
+          <div className="word-decom-card" style={{ background: 'rgba(255,255,255,0.05)', borderRadius: 20, padding: 20, textAlign: 'center' }}>
+            <div className="word-decom-emoji" style={{ fontSize: 64, marginBottom: 8 }}>{currentWordObj.emoji}</div>
 
             {/* Interactive Syllable Chips */}
-            <div className="syllable-chips-row">
-              {currentTallerWord.syllables.map((syllable, idx) => (
+            <div className="syllable-chips-row" style={{ display: 'flex', justifyContent: 'center', gap: 10, marginBottom: 16 }}>
+              {currentWordObj.syllables.map((syllable, idx) => (
                 <button
                   key={idx}
                   id={`taller-syllable-chip-${idx}`}
                   className="syllable-chip"
                   onClick={() => speakSyllable(syllable, true)}
                   aria-label={`Sílaba ${syllable}`}
+                  style={{
+                    background: 'linear-gradient(135deg, var(--purple-dark), var(--purple))',
+                    color: 'white',
+                    fontSize: 22,
+                    fontWeight: 900,
+                    padding: '10px 18px',
+                    borderRadius: 16,
+                    border: '2px solid var(--purple-light)',
+                    cursor: 'pointer'
+                  }}
                 >
                   {formatText(syllable, 'syllable')}
                 </button>
@@ -256,51 +272,143 @@ export function LecturaSilabica() {
 
             <button
               className="btn-primary btn-read-whole"
-              onClick={() => speakSyllable(currentTallerWord.word, false)}
+              onClick={() => speakSyllable(currentWordObj.word, false)}
+              style={{ margin: '0 auto 16px auto', display: 'flex', alignItems: 'center', gap: 8 }}
             >
-              🔊 Escuchar Palabra Completa: {formatText(currentTallerWord.word, 'word')}
+              🔊 Escuchar Palabra Completa: {formatText(currentWordObj.word, 'word')}
             </button>
+
+            {/* Microphone Practice Box inside Exercise */}
+            <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px dashed var(--border-strong)' }}>
+              <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-bright)', marginBottom: 8 }}>
+                🎙️ ¡Practica leyendo por el micrófono!
+              </p>
+
+              <SpeechMicButton
+                targetText={currentWordObj.word}
+                onResult={handleMicValidation}
+              />
+
+              {micResultStatus === 'correct' && (
+                <div style={{ marginTop: 10, padding: 10, borderRadius: 12, background: 'rgba(16, 185, 129, 0.2)', border: '1px solid #10B981', color: '#6EE7B7', fontWeight: 800 }}>
+                  🌟 ¡Excelente! Leíste súper bien &quot;{currentWordObj.word}&quot; (+15 XP) 🎉
+                </div>
+              )}
+              {micResultStatus === 'wrong' && (
+                <div style={{ marginTop: 10, padding: 10, borderRadius: 12, background: 'rgba(244, 63, 94, 0.2)', border: '1px solid #F43F5E', color: '#FDA4AF', fontWeight: 800 }}>
+                  💪 ¡Casi casi! Escucha la palabra e intenta de nuevo 🎙️
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Pagination for words */}
-          <div className="word-nav-controls">
-            <button
-              className="btn-secondary"
-              onClick={() => setSelectedWordIndex(i => (i > 0 ? i - 1 : WORDS_BY_SYLLABLES.length - 1))}
-            >
+          {/* Navigation Controls across the 25 exercises */}
+          <div className="word-nav-controls" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 16 }}>
+            <button className="btn-secondary" onClick={handlePrevExercise}>
               ⬅️ Anterior
             </button>
-            <span className="word-count-label">Palabra {selectedWordIndex + 1} de {WORDS_BY_SYLLABLES.length}</span>
-            <button
-              className="btn-secondary"
-              onClick={() => setSelectedWordIndex(i => (i < WORDS_BY_SYLLABLES.length - 1 ? i + 1 : 0))}
-            >
+            <span className="word-count-label" style={{ fontWeight: 800 }}>
+              {exerciseIndex + 1} / 25
+            </span>
+            <button className="btn-secondary" onClick={handleNextExercise}>
               Siguiente ➡️
             </button>
           </div>
         </div>
       )}
 
-      {/* ================= TAB 2: CONSTRUYE LA PALABRA ================= */}
+      {/* ================= TAB 2: PRÁCTICA CON MICRÓFONO ================= */}
+      {activeTab === 'microfono' && (
+        <div className="silabica-card card">
+          <h2 className="silabica-title">🎙️ Desafío de Lectura con Micrófono</h2>
+          <p className="silabica-desc">
+            Lee la palabra completa en voz alta por el micrófono. La app validará tu pronunciación:
+          </p>
+
+          <div className="mic-game-board" style={{ textAlign: 'center', padding: 20 }}>
+            <span style={{ fontSize: 72 }}>{currentWordObj.emoji}</span>
+            <h3 style={{ fontSize: 28, color: 'var(--gold)', margin: '12px 0', fontWeight: 900 }}>
+              {formatText(currentWordObj.word, 'word')}
+            </h3>
+
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginBottom: 16 }}>
+              {currentWordObj.syllables.map((s, idx) => (
+                <span
+                  key={idx}
+                  style={{
+                    background: 'var(--bg-card-2)',
+                    padding: '8px 16px',
+                    borderRadius: 12,
+                    fontSize: 18,
+                    fontWeight: 800,
+                    border: '1px solid var(--border-strong)',
+                  }}
+                >
+                  {formatText(s, 'syllable')}
+                </span>
+              ))}
+            </div>
+
+            <SpeechMicButton
+              targetText={currentWordObj.word}
+              onResult={handleMicValidation}
+            />
+
+            {micResultStatus === 'correct' && (
+              <div style={{ marginTop: 12, padding: 12, borderRadius: 14, background: 'rgba(16, 185, 129, 0.2)', border: '1px solid #10B981', color: '#6EE7B7', fontWeight: 800 }}>
+                🌟 ¡Fantástico! Pronunciación perfecta (+15 XP) 🎉
+              </div>
+            )}
+            {micResultStatus === 'wrong' && (
+              <div style={{ marginTop: 12, padding: 12, borderRadius: 14, background: 'rgba(244, 63, 94, 0.2)', border: '1px solid #F43F5E', color: '#FDA4AF', fontWeight: 800 }}>
+                💪 Inténtalo de nuevo. Di con voz clara: &quot;{currentWordObj.word}&quot;
+              </div>
+            )}
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 20 }}>
+              <button className="btn-secondary" onClick={handlePrevExercise}>
+                ⬅️ Ejercicio Anterior
+              </button>
+              <button className="btn-secondary" onClick={handleNextExercise}>
+                Siguiente Ejercicio ➡️
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ================= TAB 3: ARMADOR DE PALABRAS ================= */}
       {activeTab === 'construye' && (
         <div className="silabica-card card">
-          <h2 className="silabica-title">🧩 Juego: Armador de Palabras</h2>
-          <p className="silabica-desc">Toca las sílabas en orden correcto para armar la palabra del dibujo:</p>
+          <h2 className="silabica-title">🧩 Armador de Palabras: Letra {selectedConsonant}</h2>
+          <p className="silabica-desc">Toca las sílabas en orden correcto para formar la palabra del dibujo:</p>
 
-          <div className="build-game-board">
-            <div className="build-image-frame">
-              <span className="build-emoji">{currentBuildWord.emoji}</span>
-              <p className="build-hint">¿Qué es? Pista: {currentBuildWord.category}</p>
+          <div className="build-game-board" style={{ textAlign: 'center', padding: 16 }}>
+            <div className="build-image-frame" style={{ marginBottom: 16 }}>
+              <span className="build-emoji" style={{ fontSize: 64 }}>{currentBuildWord.emoji}</span>
             </div>
 
             {/* Target Slots */}
-            <div className="build-slots-container">
+            <div className="build-slots-container" style={{ display: 'flex', justifyContent: 'center', gap: 10, marginBottom: 16 }}>
               {currentBuildWord.syllables.map((targetSyl, idx) => {
                 const filledSyl = userBuiltSyllables[idx];
                 return (
                   <div
                     key={idx}
                     className={`build-slot ${filledSyl ? 'filled' : ''} ${buildFeedback === 'correct' ? 'correct' : buildFeedback === 'wrong' ? 'wrong' : ''}`}
+                    style={{
+                      width: 60,
+                      height: 60,
+                      borderRadius: 16,
+                      border: '2px dashed var(--purple-light)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: 20,
+                      fontWeight: 900,
+                      background: filledSyl ? 'var(--purple)' : 'rgba(255,255,255,0.05)',
+                      color: 'white',
+                    }}
                   >
                     {filledSyl ? formatText(filledSyl, 'syllable') : '?'}
                   </div>
@@ -310,19 +418,19 @@ export function LecturaSilabica() {
 
             {/* Feedback alert */}
             {buildFeedback === 'correct' && (
-              <div className="build-feedback-msg correct">
-                ¡Fantástico! Armaste <strong>{formatText(currentBuildWord.word, 'word')}</strong> ⭐🎉
+              <div className="build-feedback-msg correct" style={{ padding: 10, borderRadius: 12, background: 'rgba(16, 185, 129, 0.2)', color: '#6EE7B7', fontWeight: 800, marginBottom: 12 }}>
+                ¡Fantástico! Armaste <strong>{formatText(currentBuildWord.word, 'word')}</strong> ⭐🎉 (+20 XP)
               </div>
             )}
             {buildFeedback === 'wrong' && (
-              <div className="build-feedback-msg wrong">
+              <div className="build-feedback-msg wrong" style={{ padding: 10, borderRadius: 12, background: 'rgba(244, 63, 94, 0.2)', color: '#FDA4AF', fontWeight: 800, marginBottom: 12 }}>
                 ¡Ups! Esas sílabas no forman la palabra. Reintentando... 💪
               </div>
             )}
 
             {/* Available Syllable Options */}
             <p className="silabica-desc" style={{ marginTop: 12 }}>Selecciona una sílaba:</p>
-            <div className="build-options-grid">
+            <div className="build-options-grid" style={{ display: 'flex', justifyContent: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 16 }}>
               {buildOptions.map((syllable, idx) => (
                 <button
                   key={idx}
@@ -330,6 +438,16 @@ export function LecturaSilabica() {
                   className="build-syllable-btn"
                   onClick={() => handleSelectBuildSyllable(syllable)}
                   disabled={buildFeedback === 'correct'}
+                  style={{
+                    padding: '10px 18px',
+                    borderRadius: 14,
+                    background: 'var(--bg-card-2)',
+                    border: '1.5px solid var(--border-strong)',
+                    color: 'white',
+                    fontSize: 18,
+                    fontWeight: 800,
+                    cursor: 'pointer',
+                  }}
                 >
                   {formatText(syllable, 'syllable')}
                 </button>
@@ -337,69 +455,10 @@ export function LecturaSilabica() {
             </div>
 
             {userBuiltSyllables.length > 0 && buildFeedback !== 'correct' && (
-              <button className="btn-reset-build" onClick={handleResetBuild}>
+              <button className="btn-secondary" onClick={handleResetBuild}>
                 🔄 Borrar y empezar de nuevo
               </button>
             )}
-          </div>
-        </div>
-      )}
-
-      {/* ================= TAB 3: LECTURA CON MICRÓFONO ================= */}
-      {activeTab === 'microfono' && (
-        <div className="silabica-card card">
-          <h2 className="silabica-title">🎙️ Desafío de Lectura con Voz</h2>
-          <p className="silabica-desc">
-            Observa la palabra dividida en sílabas y di por el micrófono la sílaba marcada en azul:
-          </p>
-
-          <div className="mic-game-board">
-            <div className="mic-target-card">
-              <span className="mic-card-emoji">{currentMicWord.emoji}</span>
-
-              {/* Syllables row with active highlight */}
-              <div className="mic-syllables-display">
-                {currentMicWord.syllables.map((syl, idx) => (
-                  <span
-                    key={idx}
-                    className={`mic-syllable-box ${idx === micStep ? 'active-target' : idx < micStep ? 'completed' : ''}`}
-                  >
-                    {formatText(syl, 'syllable')}
-                  </span>
-                ))}
-              </div>
-
-              <p className="mic-instruction-text">
-                Paso {micStep + 1} de {currentMicWord.syllables.length}: Di la sílaba &quot;<strong>{formatText(targetMicSyllable, 'syllable')}</strong>&quot;
-              </p>
-            </div>
-
-            {/* Speech Microphone Button Component */}
-            <SpeechMicButton
-              targetText={targetMicSyllable}
-              onResult={handleMicResult}
-            />
-
-            {/* Feedback */}
-            {micFeedback === 'correct' && (
-              <div className="mic-feedback-banner success">
-                🌟 ¡Pronunciaste perfectamente &quot;{formatText(targetMicSyllable, 'syllable')}&quot;!
-              </div>
-            )}
-            {micFeedback === 'wrong' && (
-              <div className="mic-feedback-banner error">
-                💪 Inténtalo de nuevo. Di claro: &quot;{formatText(targetMicSyllable, 'syllable')}&quot;
-              </div>
-            )}
-
-            {/* Manual fallback button for hearing the target */}
-            <button
-              className="btn-secondary"
-              style={{ marginTop: 12 }}
-              onClick={() => speakSyllable(targetMicSyllable, true)}
-            >
-              🔊 Escuchar cómo se pronuncia &quot;{formatText(targetMicSyllable, 'syllable')}&quot;
-            </button>
           </div>
         </div>
       )}

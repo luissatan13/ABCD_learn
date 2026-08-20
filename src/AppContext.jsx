@@ -383,6 +383,27 @@ export function AppProvider({ children }) {
     localStorage.setItem('adl_user', JSON.stringify(googleUser));
   };
 
+  const loginGuest = () => {
+    const guestUser = {
+      name: 'Invitado',
+      email: '',
+      picture: '/owl_mascot.png',
+      sub: 'guest-123',
+    };
+    setUser(guestUser);
+    localStorage.setItem('adl_user', JSON.stringify(guestUser));
+
+    const cachedProfile = localStorage.getItem('adl_profile');
+    if (!cachedProfile && !profile) {
+      const defaultProfile = {
+        name: 'Invitado',
+        avatar: AVATARS[0] || { id: 'owl', emoji: '🦉', bg: '#FF9F43', label: 'Búho Sabio' }
+      };
+      setProfile(defaultProfile);
+      localStorage.setItem('adl_profile', JSON.stringify(defaultProfile));
+    }
+  };
+
   const logout = async () => {
     try {
       await signOut(auth);
@@ -441,7 +462,7 @@ export function AppProvider({ children }) {
 
   return (
     <AppContext.Provider value={{
-      user, login, logout,
+      user, login, loginGuest, logout,
       profile, saveProfile,
       authLoading,
       levels, completeLevel,

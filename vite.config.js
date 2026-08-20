@@ -9,7 +9,7 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       injectRegister: 'auto',
-      devOptions: { enabled: true },
+      devOptions: { enabled: false },
       workbox: {
         skipWaiting: true,
         clientsClaim: true,

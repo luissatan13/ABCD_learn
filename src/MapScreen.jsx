@@ -20,17 +20,20 @@ export function MapScreen({ onPlayLevel }) {
   };
 
   useEffect(() => {
-    // Función para centrar el nivel en la pantalla
+    // Scroll únicamente dentro de .scroll-area sin mover ni desplazar la ventana u otros contenedores
     const scrollToNivel = (behavior = 'auto') => {
       if (targetNodeRef.current) {
-        targetNodeRef.current.scrollIntoView({ behavior, block: 'center' });
+        const scrollArea = targetNodeRef.current.closest('.scroll-area');
+        if (scrollArea) {
+          const containerRect = scrollArea.getBoundingClientRect();
+          const targetRect = targetNodeRef.current.getBoundingClientRect();
+          const targetOffset = (targetRect.top - containerRect.top) + scrollArea.scrollTop - (containerRect.height / 2) + (targetRect.height / 2);
+          scrollArea.scrollTo({ top: Math.max(0, targetOffset), behavior });
+        }
       }
     };
 
-    // Intento 1: Inmediato (rápido sin animación)
     scrollToNivel('auto');
-
-    // Intento 2: Diferido (por si tardan en cargar las imágenes o estilos)
     const timer = setTimeout(() => {
       scrollToNivel('smooth');
     }, 350);

@@ -14,7 +14,7 @@ const STARS = Array.from({ length: 50 }, (_, i) => ({
 }));
 
 export function LoginScreen({ onLoginSuccess }) {
-  const { login } = useApp();
+  const { login, loginGuest } = useApp();
   const [loading, setLoading] = useState(false);
 
   const handleGoogleLogin = async () => {
@@ -35,6 +35,11 @@ export function LoginScreen({ onLoginSuccess }) {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleGuestLogin = () => {
+    loginGuest();
+    onLoginSuccess();
   };
 
   return (
@@ -75,7 +80,7 @@ export function LoginScreen({ onLoginSuccess }) {
           ¡Hola, Pequeño<br />
           <span>Explorador!</span>
         </h1>
-        <p className="login-subtitle">Inicia sesión con tu cuenta de Google para guardar todo tu progreso mágico. ✨</p>
+        <p className="login-subtitle">Inicia sesión con Google para guardar tu progreso o entra como invitado. ✨</p>
       </div>
 
       {/* Auth buttons */}
@@ -102,6 +107,27 @@ export function LoginScreen({ onLoginSuccess }) {
             <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
           </svg>
           {loading ? 'Conectando...' : 'Iniciar sesión con Google'}
+        </button>
+
+        <button
+          id="guest-login-btn"
+          className="btn-secondary"
+          onClick={handleGuestLogin}
+          aria-label="Entrar como invitado"
+          style={{
+            background: 'rgba(255, 255, 255, 0.15)',
+            backdropFilter: 'blur(8px)',
+            color: '#FFFFFF',
+            border: '2px solid rgba(255, 255, 255, 0.3)',
+            borderRadius: '16px',
+            padding: '12px 20px',
+            fontSize: '15px',
+            fontWeight: '700',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+          }}
+        >
+          🎮 Entrar como invitado (Demo)
         </button>
       </div>
     </div>
