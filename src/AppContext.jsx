@@ -69,8 +69,16 @@ export function AppProvider({ children }) {
   });
 
   const [profile, setProfile] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('adl_profile')) || null; }
-    catch { return null; }
+    try {
+      const activeUser = JSON.parse(localStorage.getItem('adl_user'));
+      if (activeUser && activeUser.sub) {
+        const perUser = localStorage.getItem(`adl_profile_${activeUser.sub}`);
+        if (perUser) return JSON.parse(perUser);
+      }
+      return JSON.parse(localStorage.getItem('adl_profile')) || null;
+    } catch {
+      return null;
+    }
   });
 
   const [levels, setLevels] = useState(() => {
@@ -215,9 +223,15 @@ export function AppProvider({ children }) {
   }, [user]);
 
   useEffect(() => {
-    if (profile) localStorage.setItem('adl_profile', JSON.stringify(profile));
-    else localStorage.removeItem('adl_profile');
-  }, [profile]);
+    if (profile) {
+      localStorage.setItem('adl_profile', JSON.stringify(profile));
+      if (user && user.sub) {
+        localStorage.setItem(`adl_profile_${user.sub}`, JSON.stringify(profile));
+      }
+    } else {
+      localStorage.removeItem('adl_profile');
+    }
+  }, [profile, user]);
 
   useEffect(() => {
     localStorage.setItem('adl_levels', JSON.stringify(levels));
@@ -248,40 +262,92 @@ export function AppProvider({ children }) {
         setUser(u);
         localStorage.setItem('adl_user', JSON.stringify(u));
 
-        // Fetch user progress from Firestore for this account
+        // 1) Instantly attempt to restore profile from per-user local cache
+        let existingProfile = null;
         try {
-          const userRef = doc(db, 'users', firebaseUser.uid);
-          const docSnap = await getDoc(userRef);
-          if (docSnap.exists()) {
-            const cloud = docSnap.data();
-            if (cloud.profile) {
-              setProfile(cloud.profile);
-              localStorage.setItem('adl_profile', JSON.stringify(cloud.profile));
-            }
-            if (cloud.levels && Array.isArray(cloud.levels)) {
-              setLevels(cloud.levels);
-              localStorage.setItem('adl_levels', JSON.stringify(cloud.levels));
-            }
-            if (cloud.medals && Array.isArray(cloud.medals)) {
-              setMedals(cloud.medals);
-              localStorage.setItem('adl_medals', JSON.stringify(cloud.medals));
-            }
-            if (typeof cloud.xp === 'number') {
-              setXp(cloud.xp);
-              localStorage.setItem('adl_xp', cloud.xp.toString());
-            }
-            if (cloud.mistakes) {
-              setMistakes(cloud.mistakes);
-              localStorage.setItem('adl_mistakes', JSON.stringify(cloud.mistakes));
-            }
-          }
+          const cached = localStorage.getItem(`adl_profile_${firebaseUser.uid}`) || localStorage.getItem('adl_profile');
+          if (cached) existingProfile = JSON.parse(cached);
         } catch (err) {
-          console.warn('Error loading cloud profile on auth change:', err);
+          console.warn('Local profile cache parse error:', err);
         }
+
+        if (existingProfile) {
+          setProfile(existingProfile);
+          localStorage.setItem('adl_profile', JSON.stringify(existingProfile));
+        }
+
+        // UNBLOCK APP IMMEDIATELY — do not wait for Firestore network calls!
+        setAuthLoading(false);
+
+        // 2) Asynchronously fetch user progress from Firestore in background (max 2.5s timeout)
+        const syncCloudData = async () => {
+          try {
+            const userRef = doc(db, 'users', firebaseUser.uid);
+            
+            // Timeout promise to ensure getDoc never hangs indefinitely
+            const docSnap = await Promise.race([
+              getDoc(userRef),
+              new Promise((_, reject) => setTimeout(() => reject(new Error('Firestore network timeout')), 2500))
+            ]);
+
+            if (docSnap && docSnap.exists()) {
+              const cloud = docSnap.data();
+              if (cloud.profile) {
+                setProfile(cloud.profile);
+                localStorage.setItem('adl_profile', JSON.stringify(cloud.profile));
+                localStorage.setItem(`adl_profile_${firebaseUser.uid}`, JSON.stringify(cloud.profile));
+                existingProfile = cloud.profile;
+              }
+              if (cloud.levels && Array.isArray(cloud.levels)) {
+                setLevels(cloud.levels);
+                localStorage.setItem('adl_levels', JSON.stringify(cloud.levels));
+              }
+              if (cloud.medals && Array.isArray(cloud.medals)) {
+                setMedals(cloud.medals);
+                localStorage.setItem('adl_medals', JSON.stringify(cloud.medals));
+              }
+              if (typeof cloud.xp === 'number') {
+                setXp(cloud.xp);
+                localStorage.setItem('adl_xp', cloud.xp.toString());
+              }
+              if (cloud.mistakes) {
+                setMistakes(cloud.mistakes);
+                localStorage.setItem('adl_mistakes', JSON.stringify(cloud.mistakes));
+              }
+            }
+
+            // 3) Auto-initialize default profile from Google User Info if user has no profile saved yet
+            if (!existingProfile) {
+              const defaultProfile = {
+                name: firebaseUser.displayName || 'Explorador',
+                avatar: AVATARS[0],
+              };
+              setProfile(defaultProfile);
+              localStorage.setItem('adl_profile', JSON.stringify(defaultProfile));
+              localStorage.setItem(`adl_profile_${firebaseUser.uid}`, JSON.stringify(defaultProfile));
+              setDoc(userRef, { profile: defaultProfile, user: u }, { merge: true }).catch(err => console.warn('Cloud auto profile save error:', err));
+            }
+          } catch (err) {
+            console.warn('Background cloud sync notice:', err.message || err);
+            // Fallback for offline/timeout: Auto-initialize default profile from Google account if none exists
+            setProfile(prev => {
+              if (prev) return prev;
+              const fallbackProfile = {
+                name: firebaseUser.displayName || 'Explorador',
+                avatar: AVATARS[0],
+              };
+              localStorage.setItem('adl_profile', JSON.stringify(fallbackProfile));
+              localStorage.setItem(`adl_profile_${firebaseUser.uid}`, JSON.stringify(fallbackProfile));
+              return fallbackProfile;
+            });
+          }
+        };
+
+        syncCloudData();
       } else {
         setUser(null);
+        setAuthLoading(false);
       }
-      setAuthLoading(false);
     });
 
     return () => unsubscribe();
@@ -340,9 +406,12 @@ export function AppProvider({ children }) {
   const saveProfile = (profileData) => {
     setProfile(profileData);
     localStorage.setItem('adl_profile', JSON.stringify(profileData));
-    if (user && user.sub && user.sub !== 'guest-123') {
-      const userRef = doc(db, 'users', user.sub);
-      setDoc(userRef, { profile: profileData }, { merge: true }).catch(err => console.warn('Save profile cloud error:', err));
+    if (user && user.sub) {
+      localStorage.setItem(`adl_profile_${user.sub}`, JSON.stringify(profileData));
+      if (user.sub !== 'guest-123') {
+        const userRef = doc(db, 'users', user.sub);
+        setDoc(userRef, { profile: profileData }, { merge: true }).catch(err => console.warn('Save profile cloud error:', err));
+      }
     }
   };
 
