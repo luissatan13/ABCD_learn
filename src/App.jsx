@@ -50,6 +50,19 @@ function App() {
     }
   }, [theme]);
 
+  // Global scroll listener: forward wheel scrolling from outer margins/body to active .scroll-area
+  useEffect(() => {
+    const handleGlobalWheel = (e) => {
+      const activeScrollArea = document.querySelector('.scroll-area');
+      if (activeScrollArea && !activeScrollArea.contains(e.target)) {
+        activeScrollArea.scrollTop += e.deltaY;
+      }
+    };
+
+    window.addEventListener('wheel', handleGlobalWheel, { passive: true });
+    return () => window.removeEventListener('wheel', handleGlobalWheel);
+  }, []);
+
   // ---- AUTH LOADING ----
   if (authLoading) {
     return (
