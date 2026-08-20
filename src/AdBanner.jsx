@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
 import { useApp } from './AppContext';
 
-// Publisher ID de Google AdSense oficial
+// Publisher ID y Slot ID de Google AdSense oficial
 export const ADSENSE_CLIENT_ID = 'ca-pub-1816299161304717';
+export const ADSENSE_SLOT_ID = '1076506381';
 
-export function AdBanner({ slot, format = 'auto' }) {
+export function AdBanner({ slot = ADSENSE_SLOT_ID, format = 'auto' }) {
   const { isPremium } = useApp();
 
   if (isPremium) {
@@ -15,8 +16,6 @@ export function AdBanner({ slot, format = 'auto' }) {
     window.location.hostname === 'localhost' ||
     window.location.hostname === '127.0.0.1'
   );
-
-  const hasValidSlot = slot && slot !== '0000000000';
 
   useEffect(() => {
     if (!isLocalhost && typeof window !== 'undefined') {
@@ -44,7 +43,7 @@ export function AdBanner({ slot, format = 'auto' }) {
     );
   }
 
-  // En producción (shiftcontrol.com.mx), renderizar etiqueta oficial de Google AdSense
+  // En producción (shiftcontrol.com.mx), renderizar etiqueta oficial de Google AdSense con el slot de anuncio 1076506381
   return (
     <div className="ad-banner-container" aria-label="Publicidad patrocinada">
       <div className="ad-banner-badge">Anuncio</div>
@@ -52,7 +51,7 @@ export function AdBanner({ slot, format = 'auto' }) {
         className="adsbygoogle"
         style={{ display: 'block', width: '100%', minHeight: '90px' }}
         data-ad-client={ADSENSE_CLIENT_ID}
-        {...(hasValidSlot ? { 'data-ad-slot': slot } : {})}
+        data-ad-slot={slot}
         data-ad-format={format}
         data-full-width-responsive="true"
       />
