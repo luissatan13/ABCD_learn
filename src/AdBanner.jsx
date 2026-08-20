@@ -3,9 +3,8 @@ import { useApp } from './AppContext';
 
 // Publisher ID de Google AdSense oficial
 export const ADSENSE_CLIENT_ID = 'ca-pub-1816299161304717';
-export const ADSENSE_SLOT_ID = '0000000000';
 
-export function AdBanner({ slot = ADSENSE_SLOT_ID, format = 'auto' }) {
+export function AdBanner({ slot, format = 'auto' }) {
   const { isPremium } = useApp();
 
   if (isPremium) {
@@ -17,23 +16,23 @@ export function AdBanner({ slot = ADSENSE_SLOT_ID, format = 'auto' }) {
     window.location.hostname === '127.0.0.1'
   );
 
-  const isPlaceholderSlot = !slot || slot === '0000000000' || ADSENSE_CLIENT_ID === 'ca-pub-0000000000000000';
+  const hasValidSlot = slot && slot !== '0000000000';
 
   useEffect(() => {
-    if (!isLocalhost && !isPlaceholderSlot && typeof window !== 'undefined') {
+    if (!isLocalhost && typeof window !== 'undefined') {
       try {
         (window.adsbygoogle = window.adsbygoogle || []).push({});
       } catch (e) {
         console.warn('AdSense load error:', e);
       }
     }
-  }, [isLocalhost, isPlaceholderSlot]);
+  }, [isLocalhost, slot]);
 
-  return (
-    <div className="ad-banner-container" aria-label="Publicidad patrocinada">
-      <div className="ad-banner-badge">{isLocalhost || isPlaceholderSlot ? 'Anuncio Demo' : 'Anuncio'}</div>
-
-      {isLocalhost || isPlaceholderSlot ? (
+  // En entorno local (localhost), mostrar banner demo para no saturar consola con 400s
+  if (isLocalhost) {
+    return (
+      <div className="ad-banner-container" aria-label="Publicidad patrocinada">
+        <div className="ad-banner-badge">Anuncio Demo</div>
         <div className="ad-banner-demo">
           <span className="ad-demo-icon">📢</span>
           <div className="ad-demo-text">
@@ -41,16 +40,22 @@ export function AdBanner({ slot = ADSENSE_SLOT_ID, format = 'auto' }) {
             <span>¡Hazte Premium y disfruta de la app 100% limpia!</span>
           </div>
         </div>
-      ) : (
-        <ins
-          className="adsbygoogle"
-          style={{ display: 'block', width: '100%', minHeight: '60px' }}
-          data-ad-client={ADSENSE_CLIENT_ID}
-          data-ad-slot={slot}
-          data-ad-format={format}
-          data-full-width-responsive="true"
-        />
-      )}
+      </div>
+    );
+  }
+
+  // En producción (shiftcontrol.com.mx), renderizar etiqueta oficial de Google AdSense
+  return (
+    <div className="ad-banner-container" aria-label="Publicidad patrocinada">
+      <div className="ad-banner-badge">Anuncio</div>
+      <ins
+        className="adsbygoogle"
+        style={{ display: 'block', width: '100%', minHeight: '90px' }}
+        data-ad-client={ADSENSE_CLIENT_ID}
+        {...(hasValidSlot ? { 'data-ad-slot': slot } : {})}
+        data-ad-format={format}
+        data-full-width-responsive="true"
+      />
     </div>
   );
 }
